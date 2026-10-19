@@ -55,7 +55,6 @@ def main():
         print(f"Searching for: {kw}")
         videos = fetch_youtube_videos_by_keyword(kw)
         all_new_videos.extend(videos)
-        
     if not all_new_videos:
         print("No videos fetched at all. Exiting.")
         return
