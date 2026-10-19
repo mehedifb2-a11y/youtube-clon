@@ -11,25 +11,20 @@
         header h1 { color: #ff0000; font-size: 2.5rem; margin-bottom: 10px; }
         header p { color: #aaa; }
         
-        /* Category Tabs */
         .category-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
         .category-btn { background: #2f2f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 1rem; transition: background 0.3s; }
         .category-btn.active, .category-btn:hover { background: #ff0000; }
 
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
-        .video-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s; }
-        .video-card:hover { transform: translateY(-5px); }
+        .video-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; }
         .thumbnail-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
         .thumbnail-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        .video-info { padding: 15px; }
+        .video-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .video-title { font-size: 1.1rem; font-weight: bold; line-height: 1.4; margin-bottom: 8px; color: #f1f1f1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .video-category { font-size: 0.85rem; color: #ff0000; font-weight: bold; text-transform: uppercase; }
+        .video-category { font-size: 0.85rem; color: #aaa; font-weight: bold; margin-bottom: 15px; }
         
-        /* Modal for Player */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-        .modal-content { width: 90%; max-width: 800px; aspect-ratio: 16/9; background: #000; position: relative; }
-        .modal-content iframe { width: 100%; height: 100%; border: none; }
-        .close-btn { position: absolute; top: -40px; right: 0; color: #fff; font-size: 30px; cursor: pointer; }
+        .watch-btn { display: block; width: 100%; text-align: center; background: #ff0000; color: #fff; text-decoration: none; padding: 10px; border-radius: 5px; font-weight: bold; transition: background 0.2s; }
+        .watch-btn:hover { background: #cc0000; }
     </style>
 </head>
 <body>
@@ -48,15 +43,8 @@
 
     <main class="video-grid" id="videoGrid"></main>
 
-    <div class="modal" id="videoModal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeBtn">&times;</span>
-            <div id="playerContainer" style="width:100%; height:100%;"></div>
-        </div>
-    </div>
-
     <script>
-        // আসল এবং সচল ভিডিও আইডি
+        // সচল এবং ভেরিফাইড ভিডিও ডেটাবেজ
         const videoData = [
             { id: "TcMBFSGVi4A", title: "AVENGERS: ENDGAME - Official Movie Clip", category: "cinema" },
             { id: "Cdh6n6V0aDw", title: "JAWAN - Shah Rukh Khan | Blockbuster Full Action Scene", category: "cinema" },
@@ -68,19 +56,19 @@
         ];
 
         const videoGrid = document.getElementById('videoGrid');
-        const videoModal = document.getElementById('videoModal');
-        const playerContainer = document.getElementById('playerContainer');
-        const closeBtn = document.getElementById('closeBtn');
 
         function displayVideos(videos) {
             videoGrid.innerHTML = videos.map(video => `
-                <div class="video-card" onclick="playVideo('${video.id}')">
+                <div class="video-card">
                     <div class="thumbnail-container">
                         <img src="https://youtube.com{video.id}/mqdefault.jpg" alt="${video.title}">
                     </div>
                     <div class="video-info">
-                        <div class="video-title">${video.title}</div>
-                        <div class="video-category">${video.category == 'cinema' ? 'সিনেমা' : video.category == 'natok' ? 'নাটক' : 'গান'}</div>
+                        <div>
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-category">ক্যাটাগরি: ${video.category == 'cinema' ? 'সিনেما' : video.category == 'natok' ? 'নাটক' : 'গান'}</div>
+                        </div>
+                        <a href="https://youtube.com{video.id}" target="_blank" class="watch-btn">ভিডিও দেখুন</a>
                     </div>
                 </div>
             `).join('');
@@ -99,24 +87,7 @@
             }
         }
 
-        // লিঙ্কের লেখার স্টাইল পরিবর্তন করা হলো যাতে ব্রাউজার ভুল করতে না পারে
-        function playVideo(videoId) {
-            playerContainer.innerHTML = '<iframe src="https://youtube.com' + videoId + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-            videoModal.style.display = 'flex';
-        }
-
-        closeBtn.onclick = function() {
-            videoModal.style.display = 'none';
-            playerContainer.innerHTML = '';
-        }
-
-        window.onclick = function(event) {
-            if (event.target == videoModal) {
-                videoModal.style.display = 'none';
-                playerContainer.innerHTML = '';
-            }
-        }
-
+        // প্রথমবার লোড
         displayVideos(videoData);
     </script>
 </body>
