@@ -1,219 +1,149 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ফ্রি ভিডিও হাব</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f0f0f; color: #fff; padding: 20px; }
-        header { text-align: center; margin-bottom: 25px; padding: 20px; border-bottom: 1px solid #2f2f2f; }
-        header h1 { color: #ff0000; font-size: 2.5rem; margin-bottom: 10px; }
-        header p { color: #aaa; }
-
-        .controls { max-width: 1200px; margin: 0 auto 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
-        .tab { background: #272727; color: #fff; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-weight: bold; }
-        .tab.active { background: #ff0000; }
-        .search { display: flex; gap: 8px; width: 100%; max-width: 500px; }
-        .search input { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid #333; background: #1a1a1a; color: #fff; outline: none; }
-        .search button { background: #ff0000; color: #fff; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-weight: bold; }
-
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
-        .video-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
-        .thumbnail-container { position: relative; width: 100%; padding-top: 56.25%; background: #111; }
-        .thumbnail-container img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-        .video-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .video-title { font-size: 1rem; font-weight: bold; line-height: 1.4; margin-bottom: 6px; color: #f1f1f1; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .video-channel { font-size: 0.85rem; color: #aaa; margin-bottom: 12px; }
-        .watch-btn { display: block; width: 100%; text-align: center; background: #ff0000; color: #fff; text-decoration: none; padding: 10px; border-radius: 5px; font-weight: bold; }
-        .watch-btn:hover { background: #cc0000; }
-
-        .more-wrap { text-align: center; margin: 30px 0; }
-        #moreBtn { background: #272727; color: #fff; border: 1px solid #444; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-size: 1rem; }
-        #status { text-align: center; color: #aaa; margin: 20px; }
-
-        /* ভিডিও প্লেয়ার (পপআপ) */
-        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10; align-items: center; justify-content: center; padding: 15px; }
-        #modal.open { display: flex; }
-        .player-box { width: 100%; max-width: 900px; position: relative; }
-        .player-box iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 8px; }
-        #closeBtn { position: absolute; top: -40px; right: 0; background: #ff0000; color: #fff; border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ফ্রি ভিডিও হাব</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  body { background: #0f0f0f; color: #fff; padding: 20px; }
+  header { text-align: center; padding: 15px; border-bottom: 1px solid #2f2f2f; margin-bottom: 20px; }
+  header h1 { color: #ff0000; font-size: 2.2rem; }
+  header p { color: #aaa; font-size: .9rem; margin-top: 6px; }
+  .controls { max-width: 1200px; margin: 0 auto 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  #tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .tab { background: #272727; color: #fff; border: 0; padding: 9px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+  .tab.active { background: #ff0000; }
+  #q { width: 100%; max-width: 520px; padding: 11px 16px; border-radius: 22px; border: 1px solid #333; background: #1a1a1a; color: #fff; outline: none; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; max-width: 1200px; margin: 0 auto; }
+  .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; }
+  .card:hover { background: #262626; }
+  .thumb { position: relative; padding-top: 56.25%; background: #111; }
+  .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .dur { position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.8); padding: 2px 6px; border-radius: 4px; font-size: .75rem; }
+  .info { padding: 12px; }
+  .title { font-weight: bold; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ch { color: #aaa; font-size: .82rem; margin-top: 6px; }
+  #status { text-align: center; color: #aaa; margin: 20px; }
+  #more { display: none; margin: 25px auto; background: #272727; color: #fff; border: 1px solid #444; padding: 12px 30px; border-radius: 25px; cursor: pointer; }
+  #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 10; align-items: center; justify-content: center; padding: 15px; }
+  #modal.open { display: flex; }
+  .box { width: 100%; max-width: 900px; position: relative; }
+  .box iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 8px; }
+  #close { position: absolute; top: -42px; right: 0; background: #ff0000; color: #fff; border: 0; padding: 7px 14px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+</style>
 </head>
 <body>
+<header>
+  <h1>ফ্রি ভিডিও হাব</h1>
+  <p id="upd">লোড হচ্ছে...</p>
+</header>
 
-    <header>
-        <h1>ফ্রি ভিডিও হাব</h1>
-        <p>হিন্দি, ইংলিশ, তামিল সিনেমা, বাংলা নাটক ও ভিডিও গান এক জায়গায়</p>
-    </header>
+<div class="controls">
+  <div id="tabs"></div>
+  <input id="q" type="search" placeholder="সিনেমা, নাটক বা গান খুঁজুন...">
+</div>
 
-    <div class="controls">
-        <div id="tabs"></div>
-        <div class="search">
-            <input id="q" type="text" placeholder="ভিডিও খুঁজুন...">
-            <button id="searchBtn">খুঁজুন</button>
-        </div>
-    </div>
+<main class="grid" id="grid"></main>
+<div id="status"></div>
+<button id="more">আরও দেখুন</button>
 
-    <main class="video-grid" id="grid"></main>
-    <div id="status"></div>
-    <div class="more-wrap"><button id="moreBtn" style="display:none">আরও দেখুন</button></div>
+<div id="modal"><div class="box">
+  <button id="close">বন্ধ করুন ✕</button>
+  <iframe id="player" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+</div></div>
 
-    <div id="modal">
-        <div class="player-box">
-            <button id="closeBtn">বন্ধ করুন ✕</button>
-            <iframe id="player" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
-        </div>
-    </div>
+<script>
+const PAGE = 24;
+let all = [], view = [], shown = 0, cat = "all", term = [];
+const $ = id => document.getElementById(id);
+const grid = $("grid"), more = $("more"), statusEl = $("status");
 
-    <script>
-        const API_KEY = "AIzaSyA0XpD13WvB9hr6OPwlrWsiurMAC8Z9sBU"; // এখানে আপনার API Key বসান
+const fmt = s => {
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+  return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0");
+};
 
-        // ক্যাটাগরি ও সার্চ কোয়েরি। চাইলে নতুন ক্যাটাগরি যোগ করতে পারেন।
-        const categories = [
-            { name: "হিন্দি সিনেমা",  query: "hindi full movie",       long: true },
-            { name: "ইংলিশ সিনেমা",  query: "english full movie",     long: true },
-            { name: "তামিল সিনেমা",  query: "tamil full movie",       long: true },
-            { name: "বাংলা নাটক",    query: "bangla natok",           long: false },
-            { name: "বাংলা সিনেমা",  query: "bangla full movie",      long: true },
-            { name: "ভিডিও গান",     query: "official video song",    long: false }
-        ];
+async function init() {
+  try {
+    const meta = await (await fetch("data/meta.json?t=" + Date.now(), { cache: "no-store" })).json();
+    const lists = await Promise.all(meta.cats.map(async c => {
+      const arr = await (await fetch(`data/${c.key}.json?v=${meta.updated}`)).json();
+      arr.forEach(v => { v.k = c.key; v._s = (v.t + " " + v.c).toLowerCase(); });
+      return arr;
+    }));
+    all = lists.flat().sort((a, b) => b.p.localeCompare(a.p));
 
-        let current = categories[0].query;
-        let currentLong = categories[0].long;
-        let nextPageToken = "";
-        let loading = false;
+    const tabs = $("tabs");
+    [{ key: "all", name: "সব" }, ...meta.cats].forEach(c => {
+      const b = document.createElement("button");
+      b.className = "tab" + (c.key === "all" ? " active" : "");
+      b.textContent = c.name;
+      b.onclick = () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        b.classList.add("active");
+        cat = c.key; apply();
+      };
+      tabs.appendChild(b);
+    });
 
-        const grid = document.getElementById("grid");
-        const statusEl = document.getElementById("status");
-        const moreBtn = document.getElementById("moreBtn");
-        const tabsEl = document.getElementById("tabs");
+    const mins = Math.round((Date.now() - meta.updated) / 60000);
+    $("upd").textContent = `${all.length} টি ভিডিও • শেষ আপডেট ${mins} মিনিট আগে`;
+    apply();
+  } catch (e) {
+    statusEl.textContent = "ডেটা লোড হয়নি। GitHub Action একবার রান হয়েছে কিনা দেখুন।";
+  }
+}
 
-        // ক্যাটাগরি ট্যাব তৈরি
-        categories.forEach((c, i) => {
-            const b = document.createElement("button");
-            b.className = "tab" + (i === 0 ? " active" : "");
-            b.textContent = c.name;
-            b.onclick = () => {
-                document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-                b.classList.add("active");
-                startSearch(c.query, c.long);
-            };
-            tabsEl.appendChild(b);
-        });
+function apply() {
+  view = all.filter(v => (cat === "all" || v.k === cat) && term.every(t => v._s.includes(t)));
+  grid.innerHTML = ""; shown = 0;
+  statusEl.textContent = view.length ? "" : "কোনো ভিডিও পাওয়া যায়নি।";
+  render();
+}
 
-        function startSearch(query, long) {
-            current = query;
-            currentLong = long;
-            nextPageToken = "";
-            grid.innerHTML = "";
-            loadVideos();
-        }
+function render() {
+  view.slice(shown, shown + PAGE).forEach(v => {
+    const card = document.createElement("div");
+    card.className = "card";
+    const th = document.createElement("div"); th.className = "thumb";
+    const img = document.createElement("img");
+    img.src = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`; img.alt = v.t; img.loading = "lazy";
+    const d = document.createElement("span"); d.className = "dur"; d.textContent = fmt(v.d);
+    th.append(img, d);
+    const info = document.createElement("div"); info.className = "info";
+    const t = document.createElement("div"); t.className = "title"; t.textContent = v.t;
+    const c = document.createElement("div"); c.className = "ch"; c.textContent = v.c;
+    info.append(t, c);
+    card.append(th, info);
+    card.onclick = () => openPlayer(v.id);
+    grid.appendChild(card);
+  });
+  shown += PAGE;
+  more.style.display = shown < view.length ? "block" : "none";
+}
+more.onclick = render;
 
-        async function loadVideos() {
-            if (loading) return;
-            if (API_KEY === "YOUR_API_KEY") {
-                statusEl.textContent = "কোডে আপনার YouTube API Key বসান।";
-                return;
-            }
-            loading = true;
-            statusEl.textContent = "লোড হচ্ছে...";
-            moreBtn.style.display = "none";
+// সার্চ (টাইপ করার সাথে সাথে)
+let timer;
+$("q").addEventListener("input", e => {
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    term = e.target.value.toLowerCase().split(/\s+/).filter(Boolean);
+    apply();
+  }, 200);
+});
 
-            const params = new URLSearchParams({
-                part: "snippet",
-                type: "video",
-                q: current,
-                maxResults: 24,
-                videoEmbeddable: "true",
-                safeSearch: "moderate",
-                key: API_KEY
-            });
-            if (currentLong) params.set("videoDuration", "long");
-            if (nextPageToken) params.set("pageToken", nextPageToken);
+// প্লেয়ার
+function openPlayer(id) {
+  $("player").src = "https://www.youtube.com/embed/" + id + "?autoplay=1";
+  $("modal").classList.add("open");
+}
+function closePlayer() { $("player").src = ""; $("modal").classList.remove("open"); }
+$("close").onclick = closePlayer;
+$("modal").onclick = e => { if (e.target === $("modal")) closePlayer(); };
 
-            try {
-                const res = await fetch("https://www.googleapis.com/youtube/v3/search?" + params);
-                const data = await res.json();
-
-                if (data.error) {
-                    statusEl.textContent = "সমস্যা: " + data.error.message;
-                    loading = false;
-                    return;
-                }
-
-                data.items.forEach(item => addCard(item));
-                nextPageToken = data.nextPageToken || "";
-                statusEl.textContent = grid.children.length ? "" : "কোনো ভিডিও পাওয়া যায়নি।";
-                moreBtn.style.display = nextPageToken ? "inline-block" : "none";
-            } catch (e) {
-                statusEl.textContent = "ইন্টারনেট বা API সমস্যা হয়েছে।";
-            }
-            loading = false;
-        }
-
-        function addCard(item) {
-            const id = item.id.videoId;
-            const s = item.snippet;
-            const thumb = (s.thumbnails.high || s.thumbnails.medium || s.thumbnails.default).url;
-
-            const card = document.createElement("div");
-            card.className = "video-card";
-
-            const tc = document.createElement("div");
-            tc.className = "thumbnail-container";
-            const img = document.createElement("img");
-            img.src = thumb; img.alt = s.title; img.loading = "lazy";
-            tc.appendChild(img);
-
-            const info = document.createElement("div");
-            info.className = "video-info";
-            const box = document.createElement("div");
-            const title = document.createElement("div");
-            title.className = "video-title";
-            title.textContent = s.title;          // textContent দিয়ে নিরাপদ
-            const ch = document.createElement("div");
-            ch.className = "video-channel";
-            ch.textContent = s.channelTitle;
-            box.append(title, ch);
-
-            const btn = document.createElement("a");
-            btn.className = "watch-btn";
-            btn.href = "https://www.youtube.com/watch?v=" + id;
-            btn.textContent = "ভিডিও দেখুন";
-            btn.onclick = (e) => { e.preventDefault(); openPlayer(id); };
-
-            info.append(box, btn);
-            card.append(tc, info);
-            grid.appendChild(card);
-        }
-
-        // পপআপ প্লেয়ার
-        const modal = document.getElementById("modal");
-        const player = document.getElementById("player");
-        function openPlayer(id) {
-            player.src = "https://www.youtube.com/embed/" + id + "?autoplay=1";
-            modal.classList.add("open");
-        }
-        function closePlayer() {
-            player.src = "";
-            modal.classList.remove("open");
-        }
-        document.getElementById("closeBtn").onclick = closePlayer;
-        modal.onclick = (e) => { if (e.target === modal) closePlayer(); };
-
-        // সার্চ
-        function doSearch() {
-            const v = document.getElementById("q").value.trim();
-            if (!v) return;
-            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-            startSearch(v, false);
-        }
-        document.getElementById("searchBtn").onclick = doSearch;
-        document.getElementById("q").addEventListener("keydown", e => { if (e.key === "Enter") doSearch(); });
-        moreBtn.onclick = loadVideos;
-
-        startSearch(categories[0].query, categories[0].long);
-    </script>
+init();
+</script>
 </body>
 </html>
