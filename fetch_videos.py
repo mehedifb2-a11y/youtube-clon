@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timedelta
 
 # কনফিগারেশন
-API_KEY = os.getenv("AIzaSyCQf9y6FyB1lrxFGNU8cdwBhyuww5bzkiI")
+API_KEY = os.getenv("AIzaSyA0XpD13WvB9hr6OPwlrWsiurMAC8Z9sBU")
 DATA_FILE = "videos.json"
 
 # আপনি যে যে বিষয়ের ভিডিও চান
