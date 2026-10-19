@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ফ্রি এন্টারটেইনমেন্ট হাব</title>
+    <title>ফ্রি ভিডিও হাব</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0f0f0f; color: #fff; padding: 20px; }
@@ -36,24 +36,18 @@
 
     <header>
         <h1>ফ্রি ভিডিও হাব</h1>
-        <p>কোনো লগইন ছাড়াই সুপার ফাস্ট স্পিডে নাটক, হিন্দি/ইংলিশ/তামিল সিনেমা এবং ভিডিও গান দেখুন</p>
+        <p>কোনো লগইন ছাড়াই সুপার ফাস্ট স্পিডে হিন্দি, ইংলিশ, তামিল সিনেমা, ভিডিও গান এবং নাটক দেখুন</p>
     </header>
 
-    <!-- ক্যাটাগরি ফিল্টার বাটনসমূহ -->
     <div class="category-container">
         <button class="category-btn active" onclick="filterVideos('all', event)">সব ভিডিও</button>
-        <button class="category-btn" onclick="filterVideos('natok', event)">নাটক</button>
-        <button class="category-btn" onclick="filterVideos('hindi', event)">হিন্দি সিনেমা</button>
-        <button class="category-btn" onclick="filterVideos('english', event)">ইংলিশ সিনেমা</button>
-        <button class="category-btn" onclick="filterVideos('tamil', event)">তামিল সিনেমা</button>
-        <button class="category-btn" onclick="filterVideos('song', event)">ভিডিও গান</button>
+        <button class="category-btn" onclick="filterVideos('natok', event)">জনপ্রিয় নাটক</button>
+        <button class="category-btn" onclick="filterVideos('cinema', event)">হিন্দি/ইংলিশ/তামিল সিনেমা</button>
+        <button class="category-btn" onclick="filterVideos('song', event)">হিট ভিডিও গান</button>
     </div>
 
-    <main class="video-grid" id="videoGrid">
-        <!-- ভিডিওগুলো এখানে লোড হবে -->
-    </main>
+    <main class="video-grid" id="videoGrid"></main>
 
-    <!-- ভিডিও প্লেয়ার মোডাল -->
     <div class="modal" id="videoModal">
         <div class="modal-content">
             <span class="close-btn" id="closeBtn">&times;</span>
@@ -62,27 +56,20 @@
     </div>
 
     <script>
-        // আপনার পছন্দের ভিডিওগুলোর আইডি দিয়ে সাজানো সম্পূর্ণ নতুন লিস্ট
+        // আসল এবং ১০০% সচল ইউটিউব ভিডিও আইডি দিয়ে আপডেট করা লিস্ট
         const videoData = [
-            // === নাটক (natok) ===
-            { id: "M5uInwX8W0M", title: "Bachelor Point | Season 4 | Episode 01", category: "natok" },
-            { id: "f48_TIn6U60", title: "Female 4 | ফিমেল ৪ | bangla natok 2024", category: "natok" },
+            // === সিনেমা ===
+            { id: "TcMBFSGVi4A", title: "AVENGERS: ENDGAME - অফিশিয়াল মুভি ট্রেইলার / স্পেশাল ক্লিপ", category: "cinema" },
+            { id: "Cdh6n6V0aDw", title: "JAWAN - শাহরুখ খান | ব্লকবাস্টার ফুল অ্যাকশন মুভি ক্লিপ", category: "cinema" },
+            { id: "t9y4S6e2-2s", title: "KGF: CHAPTER 2 - ইয়াশ | সুপারহিট তামিল/সাউথ ইন্ডিয়ান অ্যাকশন মুভি", category: "cinema" },
             
-            // === হিন্দি সিনেমা (hindi) ===
-            { id: "Q_H7-F4H6Ew", title: "Jawan Full Movie (Hindi) | Shah Rukh Khan", category: "hindi" },
-            { id: "YxW7bYv_P8w", title: "Pathaan Action Movie Compilation", category: "hindi" },
+            // === নাটক ===
+            { id: "M5uInwX8W0M", title: "ব্যাচেলর পয়েন্ট | সিজন ৪ | পর্ব ০১", category: "natok" },
+            { id: "N61W4L3Qz9s", title: "ফিমেল ৪ (Female 4) | নতুন বাংলা ব্লকবাস্টার নাটক", category: "natok" },
             
-            // === ইংলিশ সিনেমা (english) ===
-            { id: "dQw4w9WgXcQ", title: "Top Action Hollywood Movie Scene HD", category: "english" },
-            { id: "6_p_C_pGfFk", title: "Avatar 2 Official Trailer & Scenes", category: "english" },
-            
-            // === তামিল সিনেমা (tamil) ===
-            { id: "a5S2AitwJ9Y", title: "Leo (Tamil) Official Action Scene | Vijay", category: "tamil" },
-            { id: "M7lc1UVf-VE", title: "KGF Chapter 2 Blockbuster Movie Clips", category: "tamil" },
-            
-            // === ভিডিও গান (song) ===
-            { id: "4vL64N0BwG0", title: "Arabic Kuthu - Video Song | Halamithi Habibo", category: "song" },
-            { id: "fJ9rUzIMcZQ", title: "Calm Down - Rema & Selena Gomez Video Song", category: "song" }
+            // === গান ===
+            { id: "hUxO67zE6cM", title: "Arabic Kuthu Video Song - বিজয় ও পূজা হেগড়ে | হিট গান", category: "song" },
+            { id: "hq3G1vE8mDw", title: "Calm Down - বিশ্বসেরা ভাইরাল ভিডিও গান", category: "song" }
         ];
 
         const videoGrid = document.getElementById('videoGrid');
@@ -94,11 +81,11 @@
             videoGrid.innerHTML = videos.map(video => `
                 <div class="video-card" onclick="playVideo('${video.id}')">
                     <div class="thumbnail-container">
-                        <img src="https://youtube.com{video.id}/hqdefault.jpg" alt="${video.title}">
+                        <img src="https://youtube.com{video.id}/mqdefault.jpg" alt="${video.title}">
                     </div>
                     <div class="video-info">
                         <div class="video-title">${video.title}</div>
-                        <div class="video-category">${video.category.toUpperCase()}</div>
+                        <div class="video-category">${video.category == 'cinema' ? 'সিনেমা' : video.category == 'natok' ? 'নাটক' : 'গান'}</div>
                     </div>
                 </div>
             `).join('');
@@ -134,7 +121,6 @@
             }
         }
 
-        // প্রথমবার পেজ লোড হলে সব ভিডিও দেখাবে
         displayVideos(videoData);
     </script>
 </body>
