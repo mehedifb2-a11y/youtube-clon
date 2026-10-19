@@ -58,20 +58,28 @@
         const videoGrid = document.getElementById('videoGrid');
 
         function displayVideos(videos) {
-            videoGrid.innerHTML = videos.map(video => `
-                <div class="video-card">
-                    <div class="thumbnail-container">
-                        <img src="https://youtube.com{video.id}/mqdefault.jpg" alt="${video.title}">
-                    </div>
-                    <div class="video-info">
-                        <div>
-                            <div class="video-title">${video.title}</div>
-                            <div class="video-category">ক্যাটাগরি: ${video.category == 'cinema' ? 'সিনেما' : video.category == 'natok' ? 'নাটক' : 'গান'}</div>
-                        </div>
-                        <a href="https://youtube.com{video.id}" target="_blank" class="watch-btn">ভিডিও দেখুন</a>
-                    </div>
-                </div>
-            `).join('');
+            let htmlContent = '';
+            for (let i = 0; i < videos.length; i++) {
+                let video = videos[i];
+                let catText = 'গান';
+                if (video.category === 'cinema') { catText = 'সিনেমা'; }
+                if (video.category === 'natok') { catText = 'নাটক'; }
+
+                // এখানে স্ট্রিং কনক্যাটিনেশন ব্যবহার করা হয়েছে যাতে কোনো ব্রাউজারে ফরম্যাট ভুল না হয়
+                htmlContent += '<div class="video-card">' +
+                    '<div class="thumbnail-container">' +
+                        '<img src="https://youtube.com' + video.id + '/mqdefault.jpg" alt="' + video.title + '">' +
+                    '</div>' +
+                    '<div class="video-info">' +
+                        '<div>' +
+                            '<div class="video-title">' + video.title + '</div>' +
+                            '<div class="video-category">ক্যাটাগরি: ' + catText + '</div>' +
+                        '</div>' +
+                        '<a href="https://youtube.com' + video.id + '" target="_blank" class="watch-btn">ভিဒီও দেখুন</a>' +
+                    '</div>' +
+                '</div>';
+            }
+            videoGrid.innerHTML = htmlContent;
         }
 
         function filterVideos(category, event) {
@@ -82,12 +90,17 @@
             if (category === 'all') {
                 displayVideos(videoData);
             } else {
-                const filtered = videoData.filter(v => v.category === category);
+                const filtered = [];
+                for (let i = 0; i < videoData.length; i++) {
+                    if (videoData[i].category === category) {
+                        filtered.push(videoData[i]);
+                    }
+                }
                 displayVideos(filtered);
             }
         }
 
-        // প্রথমবার লোড
+        // প্রথমবার পেজ লোড
         displayVideos(videoData);
     </script>
 </body>
