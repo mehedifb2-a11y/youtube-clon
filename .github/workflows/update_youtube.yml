@@ -1,0 +1,34 @@
+name: Auto Update YouTube Videos
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # প্রতি ৩০ মিনিট পর পর স্বয়ংক্রিয়ভাবে চলবে
+  workflow_dispatch: # এটি থাকলে আপনি চাইলে ম্যানুয়ালিও ওয়ান-ক্লিক করে টেস্ট করতে পারবেন
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install Dependencies
+      run: pip install requests
+
+    - name: Run Script
+      env:
+        YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+      run: python fetch_videos.py
+
+    - name: Commit and Push Changes
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+        git add videos.json
+        git diff-index --quiet HEAD || git commit -m "Auto-updated video cache"
+        git push
