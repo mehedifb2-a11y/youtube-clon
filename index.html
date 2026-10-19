@@ -3,21 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আমার এআই ইউটিউব পোর্টাল</title>
+    <title>এন্টারটেইনমেন্ট প্লাস হাব</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #0f0f0f; color: #fff; padding: 20px; }
         header { text-align: center; margin-bottom: 40px; padding: 20px; border-bottom: 1px solid #2f2f2f; }
         header h1 { color: #ff0000; font-size: 2.5rem; margin-bottom: 10px; }
         header p { color: #aaa; }
+        
+        /* Category Tabs */
+        .category-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .category-btn { background: #2f2f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 1rem; transition: background 0.3s; }
+        .category-btn.active, .category-btn:hover { background: #ff0000; }
+
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
         .video-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s; }
         .video-card:hover { transform: translateY(-5px); }
-        .thumbnail-container { position: relative; width: 100%; pt: 56.25%; /* 16:9 Aspect Ratio */ }
-        .thumbnail-container img { width: 100%; display: block; }
+        .thumbnail-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
+        .thumbnail-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         .video-info { padding: 15px; }
         .video-title { font-size: 1.1rem; font-weight: bold; line-height: 1.4; margin-bottom: 8px; color: #f1f1f1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .video-date { font-size: 0.85rem; color: #aaa; }
+        .video-category { font-size: 0.85rem; color: #ff0000; font-weight: bold; text-transform: uppercase; }
+        
         /* Modal for Player */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
         .modal-content { width: 90%; max-width: 800px; aspect-ratio: 16/9; background: #000; position: relative; }
@@ -29,11 +36,19 @@
 
     <header>
         <h1>ফ্রি ভিডিও হাব</h1>
-        <p>কোনো লগইন ছাড়াই সুপার ফাস্ট স্পিডে ইউটিউব ভিডিও দেখুন (প্রতি ৩০ মিনিটে অটো-আপডেট)</p>
+        <p>কোনো লগইন ছাড়াই সুপার ফাস্ট স্পিডে হিন্দি, ইংলিশ, তামিল সিনেমা, ভিডিও গান এবং নাটক দেখুন</p>
     </header>
 
+    <!-- ক্যাটাগরি ফিল্টার বাটনসমূহ -->
+    <div class="category-container">
+        <button class="category-btn active" onclick="filterVideos('all')">সব ভিডিও</button>
+        <button class="category-btn" onclick="filterVideos('movie')">হিন্দি/ইংলিশ/তামিল সিনেমা</button>
+        <button class="category-btn" onclick="filterVideos('song')">হিট ভিডিও গান</button>
+        <button class="category-btn" onclick="filterVideos('natok')">জনপ্রিয় নাটক</button>
+    </div>
+
     <main class="video-grid" id="videoGrid">
-        <!-- জাভাস্ক্রিপ্ট দিয়ে ভিডিওগুলো এখানে লোড হবে -->
+        <!-- ভিডিওগুলো এখানে স্বয়ংক্রিয়ভাবে লোড হবে -->
     </main>
 
     <!-- ভিডিও প্লেয়ার মোডাল -->
@@ -45,49 +60,70 @@
     </div>
 
     <script>
+        // এখানে আপনি আপনার পছন্দমতো যেকোনো ভিডিওর ID বসিয়ে লিস্ট আরও বড় করতে পারবেন!
+        const videoData = [
+            // === সিনেমা (movie) ===
+            { id: "d9MyW72ELq0", title: "AVENGERS: ENDGAME - অফিশিয়াল মুভি ট্রেলার / স্পেশাল ক্লিপ", category: "movie" },
+            { id: "kQDd1AhGIHk", title: "JAWAN - শাহরুখ খান | ব্লকবাস্টার ফুল অ্যাকশন মুভি ক্লিপ", category: "movie" },
+            { id: "HkuKHw0t73o", title: "KGF: CHAPTER 2 - ইয়াশ | সুপারহিট তামিল/সাউথ ইন্ডিয়ান অ্যাকশন মুভি", category: "movie" },
+            { id: "URnZqWJLy_k", title: "SALAAR - প্রভাস | ধামাকাদার সাউথ ইন্ডিয়ান ফুল মুভি স্পেশাল", category: "movie" },
+            
+            // === ভিডিও গান (song) ===
+            { id: "dQw4w9WgXcQ", title: "Rick Astley - Never Gonna Give You Up (ক্লাসিক ইংলিশ পপ গান)", category: "song" },
+            { id: "hT_nvWreIhg", title: "DESPACITO - লুইস ফনসি (বিশ্বখ্যাত গ্লোবাল হিট মিউজিক ভিডিও)", category: "song" },
+            { id: "Kh2Z9TqgJk0", title: "LUT GAYE - ইমরান হাশমি | জুবিন নটিয়াল (সুপারহিট হিন্দি ভিডিও গান)", category: "song" },
+            { id: "V7LwfY5U5WI", title: "TUM HI HO - অরিজিৎ সিং | আশিকি ২ (জনপ্রিয় রোমান্টিক হিন্দি গান)", category: "song" },
+            
+            // === নাটক (natok) ===
+            { id: "M5uInwX8W0M", title: "ব্যাচেলর পয়েন্ট | সিজন ৪ | এক্সক্লুসিভ ধামাকা পর্ব", category: "natok" },
+            { id: "T2S8cLtWz1A", title: "ফানি ফ্যামিলি ড্রামা - সেরা কমেডি স্পেশাল নাটক", category: "natok" },
+            { id: "N6p3aT9wQyE", title: "রোমান্টিক কমেডি নাটক - ট্রেন্ডিং ড্রামা কালেকশন", category: "natok" }
+        ];
+
         const videoGrid = document.getElementById('videoGrid');
         const videoModal = document.getElementById('videoModal');
         const playerContainer = document.getElementById('playerContainer');
         const closeBtn = document.getElementById('closeBtn');
 
-        // JSON ফাইল থেকে ভিডিওর ডাটা নিয়ে আসা
-        async function loadVideos() {
-            try {
-                const response = await fetch('videos.json');
-                if (!response.ok) throw new Error('ক্যাশ ডাটা পাওয়া যায়নি।');
-                const videos = await response.json();
-                
-                if(videos.length === 0) {
-                    videoGrid.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">বর্তমানে কোনো ভিডিও নেই।</p>';
-                    return;
-                }
-
-                videoGrid.innerHTML = videos.map(video => `
-                    <div class="video-card" onclick="playVideo('${video.id}')">
-                        <div class="thumbnail-container">
-                            <img src="${video.thumbnail}" alt="${video.title}">
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">${video.title}</div>
-                            <div class="video-date">${new Date(video.publishedAt).toLocaleDateString('bn-BD')}</div>
-                        </div>
+        function displayVideos(videos) {
+            videoGrid.innerHTML = videos.map(video => `
+                <div class="video-card" onclick="playVideo('${video.id}')">
+                    <div class="thumbnail-container">
+                        <img src="https://youtube.com{video.id}/hqdefault.jpg" alt="${video.title}">
                     </div>
-                `).join('');
-            } catch (error) {
-                videoGrid.innerHTML = `<p style="text-align:center; grid-column: 1/-1; color: #ff4444;">${error.message} প্রথমবার রান হতে ৩০ মিনিট পর্যন্ত সময় লাগতে পারে।</p>`;
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-category">${video.category == 'movie' ? 'সিনেমা' : video.category == 'song' ? 'ভিডিও গান' : 'নাটক'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterVideos(category) {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // ইভেন্ট টার্গেট হ্যান্ডেলিং নিরাপদ করা
+            if(event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            if (category === 'all') {
+                displayVideos(videoData);
+            } else {
+                const filtered = videoData.filter(v => v.category === category);
+                displayVideos(filtered);
             }
         }
 
-        // ভিডিও প্লে করার ফাংশন (ইউটিউব এমবেড প্লেয়ার)
         function playVideo(videoId) {
             playerContainer.innerHTML = `<iframe src="https://youtube.com{videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             videoModal.style.display = 'flex';
         }
 
-        // মোডাল বন্ধ করা
         closeBtn.onclick = function() {
             videoModal.style.display = 'none';
-            playerContainer.innerHTML = ''; // ভিডিও স্টপ করার জন্য
+            playerContainer.innerHTML = '';
         }
 
         window.onclick = function(event) {
@@ -97,8 +133,8 @@
             }
         }
 
-        // পেজ লোড হলে রান হবে
-        loadVideos();
+        // লোড হওয়ার সাথে সাথে সব ভিডিও দেখাবে
+        displayVideos(videoData);
     </script>
 </body>
 </html>
