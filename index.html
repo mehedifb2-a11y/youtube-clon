@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আমার এআই ইউটিউব পোর্টাল</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0f0f0f; color: #fff; padding: 20px; }
+        header { text-align: center; margin-bottom: 40px; padding: 20px; border-bottom: 1px solid #2f2f2f; }
+        header h1 { color: #ff0000; font-size: 2.5rem; margin-bottom: 10px; }
+        header p { color: #aaa; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .video-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s; }
+        .video-card:hover { transform: translateY(-5px); }
+        .thumbnail-container { position: relative; width: 100%; pt: 56.25%; /* 16:9 Aspect Ratio */ }
+        .thumbnail-container img { width: 100%; display: block; }
+        .video-info { padding: 15px; }
+        .video-title { font-size: 1.1rem; font-weight: bold; line-height: 1.4; margin-bottom: 8px; color: #f1f1f1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .video-date { font-size: 0.85rem; color: #aaa; }
+        /* Modal for Player */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        .modal-content { width: 90%; max-width: 800px; aspect-ratio: 16/9; background: #000; position: relative; }
+        .modal-content iframe { width: 100%; height: 100%; border: none; }
+        .close-btn { position: absolute; top: -40px; right: 0; color: #fff; font-size: 30px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ফ্রি ভিডিও হাব</h1>
+        <p>কোনো লগইন ছাড়াই সুপার ফাস্ট স্পিডে ইউটিউব ভিডিও দেখুন (প্রতি ৩০ মিনিটে অটো-আপডেট)</p>
+    </header>
+
+    <main class="video-grid" id="videoGrid">
+        <!-- জাভাস্ক্রিপ্ট দিয়ে ভিডিওগুলো এখানে লোড হবে -->
+    </main>
+
+    <!-- ভিডিও প্লেয়ার মোডাল -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <div id="playerContainer" style="width:100%; height:100%;"></div>
+        </div>
+    </div>
+
+    <script>
+        const videoGrid = document.getElementById('videoGrid');
+        const videoModal = document.getElementById('videoModal');
+        const playerContainer = document.getElementById('playerContainer');
+        const closeBtn = document.getElementById('closeBtn');
+
+        // JSON ফাইল থেকে ভিডিওর ডাটা নিয়ে আসা
+        async function loadVideos() {
+            try {
+                const response = await fetch('videos.json');
+                if (!response.ok) throw new Error('ক্যাশ ডাটা পাওয়া যায়নি।');
+                const videos = await response.json();
+                
+                if(videos.length === 0) {
+                    videoGrid.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">বর্তমানে কোনো ভিডিও নেই।</p>';
+                    return;
+                }
+
+                videoGrid.innerHTML = videos.map(video => `
+                    <div class="video-card" onclick="playVideo('${video.id}')">
+                        <div class="thumbnail-container">
+                            <img src="${video.thumbnail}" alt="${video.title}">
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-date">${new Date(video.publishedAt).toLocaleDateString('bn-BD')}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                videoGrid.innerHTML = `<p style="text-align:center; grid-column: 1/-1; color: #ff4444;">${error.message} প্রথমবার রান হতে ৩০ মিনিট পর্যন্ত সময় লাগতে পারে।</p>`;
+            }
+        }
+
+        // ভিডিও প্লে করার ফাংশন (ইউটিউব এমবেড প্লেয়ার)
+        function playVideo(videoId) {
+            playerContainer.innerHTML = `<iframe src="https://youtube.com{videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            videoModal.style.display = 'flex';
+        }
+
+        // মোডাল বন্ধ করা
+        closeBtn.onclick = function() {
+            videoModal.style.display = 'none';
+            playerContainer.innerHTML = ''; // ভিডিও স্টপ করার জন্য
+        }
+
+        window.onclick = function(event) {
+            if (event.target == videoModal) {
+                videoModal.style.display = 'none';
+                playerContainer.innerHTML = '';
+            }
+        }
+
+        // পেজ লোড হলে রান হবে
+        loadVideos();
+    </script>
+</body>
+</html>
