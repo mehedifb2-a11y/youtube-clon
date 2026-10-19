@@ -16,7 +16,7 @@
   .tab.active { background: #ff0000; }
   #q { width: 100%; max-width: 520px; padding: 11px 16px; border-radius: 22px; border: 1px solid #333; background: #1a1a1a; color: #fff; outline: none; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; max-width: 1200px; margin: 0 auto; }
-  .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; display: flex; flex-direction: column; }
+  .card { background: #1f1f1f; border-radius: 8px; overflow: hidden; cursor: pointer; }
   .card:hover { background: #262626; }
   .thumb { position: relative; padding-top: 56.25%; background: #111; }
   .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -25,7 +25,7 @@
   .title { font-weight: bold; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .ch { color: #aaa; font-size: .82rem; margin-top: 6px; }
   #status { text-align: center; color: #aaa; margin: 20px; }
-  #more { display: none; margin: 25px auto; background: #272727; color: #fff; border: 1px solid #444; padding: 12px 30px; border-radius: 25px; cursor: pointer; }
+  .btn { display: none; margin: 20px auto; background: #272727; color: #fff; border: 1px solid #444; padding: 12px 28px; border-radius: 25px; cursor: pointer; }
   #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); z-index: 10; align-items: center; justify-content: center; padding: 15px; }
   #modal.open { display: flex; }
   .box { width: 100%; max-width: 900px; position: relative; }
@@ -46,7 +46,8 @@
 
 <main class="grid" id="grid"></main>
 <div id="status"></div>
-<button id="more">আরও দেখুন</button>
+<button class="btn" id="more">আরও দেখুন</button>
+<button class="btn" id="live">YouTube থেকে খুঁজুন</button>
 
 <div id="modal"><div class="box">
   <button id="close">বন্ধ করুন ✕</button>
@@ -54,58 +55,157 @@
 </div></div>
 
 <script>
+const API_KEY = "AIzaSyA0XpD13WvB9hr6OPwlrWsiurMAC8Z9sBU";   // এখানে আপনার YouTube API Key বসান
+const REFRESH_MIN = 30;           // কত মিনিট পর পর নতুন ভিডিও আনবে
+const KEEP_DAYS = 60;             // ৬০ দিন পর অটো ডিলিট
+const MAX_PER_CAT = 1500;         // প্রতি ক্যাটাগরিতে সর্বোচ্চ ভিডিও
 const PAGE = 24;
-let all = [], view = [], shown = 0, cat = "all", term = [];
-const $ = id => document.getElementById(id);
-const grid = $("grid"), more = $("more"), statusEl = $("status");
 
+// নতুন ক্যাটাগরি বা কোয়েরি এখানে যোগ করতে পারেন
+const CATS = [
+  { key: "hindi",   name: "হিন্দি সিনেমা",        long: true,  minSec: 2400, queries: ["hindi full movie", "bollywood full movie hd"] },
+  { key: "english", name: "ইংলিশ সিনেমা",        long: true,  minSec: 2400, queries: ["english full movie", "hollywood full movie hd"] },
+  { key: "tamil",   name: "তামিল সিনেমা",        long: true,  minSec: 2400, queries: ["tamil full movie", "tamil movie hd"] },
+  { key: "tamildub",name: "তামিল বাংলা ডাবিং",   long: true,  minSec: 2400, queries: ["tamil movie bangla dubbed full movie", "south indian bangla dubbed movie"] },
+  { key: "otherdub",name: "হিন্দি/ইংলিশ বাংলা ডাবিং", long: true, minSec: 2400, queries: ["hindi movie bangla dubbed full movie", "hollywood bangla dubbed full movie"] },
+  { key: "bnmovie", name: "বাংলা সিনেমা",        long: true,  minSec: 2400, queries: ["bangla full movie", "bengali movie hd"] },
+  { key: "natok",   name: "বাংলা নাটক",          long: false, minSec: 600,  queries: ["bangla natok", "bangla new natok 2026"] },
+  { key: "song",    name: "ভিডিও গান",           long: false, minSec: 90,   queries: ["official video song", "new bangla song"] },
+  { key: "found",   name: "সার্চ রেজাল্ট",        long: false, minSec: 60,   queries: [] }
+];
+
+const DAY = 864e5;
+const $ = id => document.getElementById(id);
+const grid = $("grid"), more = $("more"), live = $("live"), statusEl = $("status");
+
+// ---------- ক্যাশ (localStorage) ----------
+function lsGet(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } }
+function saveStore(key, arr) {
+  for (let i = 0; i < 4; i++) {
+    try { localStorage.setItem("vh_" + key, JSON.stringify(arr)); return; }
+    catch { arr = arr.slice(0, Math.floor(arr.length / 2)); }   // জায়গা না থাকলে অর্ধেক কমায়
+  }
+}
+const store = {};
+CATS.forEach(c => store[c.key] = lsGet("vh_" + c.key, []));
+const meta = lsGet("vh_meta", { last: 0, rr: 0, block: 0 });
+const saveMeta = () => { try { localStorage.setItem("vh_meta", JSON.stringify(meta)); } catch {} };
+
+// ---------- YouTube API ----------
+const decode = s => { const t = document.createElement("textarea"); t.innerHTML = s; return t.value; };
+const toSec = iso => {
+  const m = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(iso || "") || [];
+  return (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0);
+};
+async function yt(path, params) {
+  const u = new URL("https://www.googleapis.com/youtube/v3/" + path);
+  for (const [k, v] of Object.entries({ ...params, key: API_KEY })) u.searchParams.set(k, v);
+  const j = await (await fetch(u)).json();
+  if (j.error) { const e = new Error(j.error.message); e.quota = /quota/i.test(j.error.message); throw e; }
+  return j;
+}
+
+// একটা কোয়েরি সার্চ করে ক্যাটাগরির ক্যাশে যোগ করে
+async function fetchInto(cat, q) {
+  const p = { part: "snippet", type: "video", q, maxResults: 50, order: "date",
+              videoEmbeddable: "true", safeSearch: "moderate" };
+  if (cat.long) p.videoDuration = "long";
+  const j = await yt("search", p);
+  const items = j.items.map(it => ({ id: it.id.videoId, t: decode(it.snippet.title),
+                                     c: decode(it.snippet.channelTitle), p: it.snippet.publishedAt }));
+  const ids = items.map(v => v.id);
+  const det = {};
+  if (ids.length) {
+    const d = await yt("videos", { part: "contentDetails,status", id: ids.join(","), maxResults: 50 });
+    d.items.forEach(v => { if (v.status?.embeddable) det[v.id] = toSec(v.contentDetails.duration); });
+  }
+  const now = Date.now();
+  const map = new Map(store[cat.key].map(v => [v.id, v]));
+  let added = 0;
+  items.forEach(v => {
+    if (det[v.id] == null || det[v.id] < cat.minSec) return;
+    if (!map.has(v.id)) added++;
+    map.set(v.id, { id: v.id, t: v.t, c: v.c, p: v.p, d: det[v.id], f: now });  // f = সর্বশেষ দেখা
+  });
+  store[cat.key] = [...map.values()]
+    .filter(v => now - v.f < KEEP_DAYS * DAY)          // ৬০ দিনের পুরনো মোছা
+    .sort((a, b) => b.p.localeCompare(a.p))
+    .slice(0, MAX_PER_CAT);
+  saveStore(cat.key, store[cat.key]);
+  return added;
+}
+
+// ---------- অটো আপডেট ----------
+let busy = false;
+async function safely(fn) {
+  if (busy) return;
+  if (API_KEY === "YOUR_API_KEY") { statusEl.textContent = "কোডে আপনার YouTube API Key বসান।"; return; }
+  if (Date.now() < meta.block) return;
+  busy = true;
+  try { await fn(); }
+  catch (e) {
+    if (e.quota) { meta.block = Date.now() + 3600e3; saveMeta(); statusEl.textContent = "আজকের API কোটা শেষ। ক্যাশ থেকে ভিডিও দেখানো হচ্ছে, পরে আবার চেষ্টা হবে।"; }
+    else statusEl.textContent = "API সমস্যা: " + e.message;
+  }
+  busy = false;
+  rebuild(); apply(false); showUpdated();
+}
+
+async function fillEmpty() {          // প্রথমবার: খালি ক্যাটাগরি ভরে
+  for (const c of CATS) {
+    if (!c.queries.length || store[c.key].length) continue;
+    statusEl.textContent = `${c.name} লোড হচ্ছে...`;
+    await fetchInto(c, c.queries[0]);
+    meta.last = Date.now(); saveMeta();
+    rebuild(); apply(false);
+  }
+  statusEl.textContent = "";
+}
+
+async function refreshNext() {        // প্রতি ৩০ মিনিটে একটা ক্যাটাগরি পালা করে
+  const real = CATS.filter(c => c.queries.length);
+  const c = real[meta.rr % real.length];
+  const q = c.queries[Math.floor(meta.rr / real.length) % c.queries.length];
+  meta.rr++;
+  await fetchInto(c, q);
+  meta.last = Date.now(); saveMeta();
+}
+
+function tick() {
+  const needFill = CATS.some(c => c.queries.length && !store[c.key].length);
+  if (needFill) safely(fillEmpty);
+  else if (Date.now() - meta.last >= REFRESH_MIN * 60000) safely(refreshNext);
+  showUpdated();
+}
+
+// ---------- ইউআই ----------
+let all = [], view = [], shown = 0, cat = "all", term = [];
 const fmt = s => {
   const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
   return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0");
 };
-
-async function init() {
-  try {
-    const meta = await (await fetch("data/meta.json?t=" + Date.now(), { cache: "no-store" })).json();
-    const lists = await Promise.all(meta.cats.map(async c => {
-      const arr = await (await fetch(`data/${c.key}.json?v=${meta.updated}`)).json();
-      arr.forEach(v => { v.k = c.key; v._s = (v.t + " " + v.c).toLowerCase(); });
-      return arr;
-    }));
-    all = lists.flat().sort((a, b) => b.p.localeCompare(a.p));
-
-    const tabs = $("tabs");
-    [{ key: "all", name: "সব" }, ...meta.cats].forEach(c => {
-      const b = document.createElement("button");
-      b.className = "tab" + (c.key === "all" ? " active" : "");
-      b.textContent = c.name;
-      b.onclick = () => {
-        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-        b.classList.add("active");
-        cat = c.key; apply();
-      };
-      tabs.appendChild(b);
-    });
-
-    const mins = Math.round((Date.now() - meta.updated) / 60000);
-    $("upd").textContent = `${all.length} টি ভিডিও • শেষ আপডেট ${mins} মিনিট আগে`;
-    apply();
-  } catch (e) {
-    statusEl.textContent = "ডেটা লোড হয়নি। GitHub Action একবার রান হয়েছে কিনা দেখুন।";
-  }
+function rebuild() {
+  const seen = new Set(); all = [];
+  CATS.forEach(c => store[c.key].forEach(v => {
+    if (seen.has(v.id)) return; seen.add(v.id);
+    all.push({ ...v, k: c.key, _s: (v.t + " " + v.c).toLowerCase() });
+  }));
+  all.sort((a, b) => b.p.localeCompare(a.p));
 }
-
-function apply() {
+function showUpdated() {
+  const mins = meta.last ? Math.round((Date.now() - meta.last) / 60000) : null;
+  $("upd").textContent = `${all.length} টি ভিডিও` + (mins == null ? "" : ` • শেষ আপডেট ${mins} মিনিট আগে`);
+}
+function apply(reset = true) {
   view = all.filter(v => (cat === "all" || v.k === cat) && term.every(t => v._s.includes(t)));
   grid.innerHTML = ""; shown = 0;
-  statusEl.textContent = view.length ? "" : "কোনো ভিডিও পাওয়া যায়নি।";
+  if (!view.length && !busy && !statusEl.textContent.includes("লোড")) statusEl.textContent = "ক্যাশে কিছু পাওয়া যায়নি।";
+  live.style.display = term.length ? "block" : "none";
   render();
 }
-
 function render() {
   view.slice(shown, shown + PAGE).forEach(v => {
-    const card = document.createElement("div");
-    card.className = "card";
+    const card = document.createElement("div"); card.className = "card";
     const th = document.createElement("div"); th.className = "thumb";
     const img = document.createElement("img");
     img.src = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`; img.alt = v.t; img.loading = "lazy";
@@ -114,36 +214,57 @@ function render() {
     const info = document.createElement("div"); info.className = "info";
     const t = document.createElement("div"); t.className = "title"; t.textContent = v.t;
     const c = document.createElement("div"); c.className = "ch"; c.textContent = v.c;
-    info.append(t, c);
-    card.append(th, info);
+    info.append(t, c); card.append(th, info);
     card.onclick = () => openPlayer(v.id);
     grid.appendChild(card);
   });
   shown += PAGE;
+  if (view.length) statusEl.textContent = statusEl.textContent.includes("লোড") ? statusEl.textContent : "";
   more.style.display = shown < view.length ? "block" : "none";
 }
 more.onclick = render;
 
-// সার্চ (টাইপ করার সাথে সাথে)
+// ট্যাব
+[{ key: "all", name: "সব" }, ...CATS].forEach(c => {
+  const b = document.createElement("button");
+  b.className = "tab" + (c.key === "all" ? " active" : ""); b.textContent = c.name;
+  b.onclick = () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    b.classList.add("active"); cat = c.key; statusEl.textContent = ""; apply();
+  };
+  $("tabs").appendChild(b);
+});
+
+// সার্চ (ক্যাশে, সঙ্গে সঙ্গে)
 let timer;
 $("q").addEventListener("input", e => {
   clearTimeout(timer);
   timer = setTimeout(() => {
     term = e.target.value.toLowerCase().split(/\s+/).filter(Boolean);
-    apply();
+    statusEl.textContent = ""; apply();
   }, 200);
 });
 
+// ক্যাশে না পেলে YouTube থেকে লাইভ সার্চ (১০০ কোটা খরচ)
+live.onclick = () => {
+  const q = $("q").value.trim(); if (!q) return;
+  safely(async () => {
+    statusEl.textContent = "YouTube থেকে খোঁজা হচ্ছে...";
+    const n = await fetchInto(CATS.find(c => c.key === "found"), q);
+    statusEl.textContent = n ? "" : "নতুন কিছু পাওয়া যায়নি।";
+  });
+};
+
 // প্লেয়ার
-function openPlayer(id) {
-  $("player").src = "https://www.youtube.com/embed/" + id + "?autoplay=1";
-  $("modal").classList.add("open");
-}
+function openPlayer(id) { $("player").src = "https://www.youtube.com/embed/" + id + "?autoplay=1"; $("modal").classList.add("open"); }
 function closePlayer() { $("player").src = ""; $("modal").classList.remove("open"); }
 $("close").onclick = closePlayer;
 $("modal").onclick = e => { if (e.target === $("modal")) closePlayer(); };
 
-init();
+// শুরু
+rebuild(); apply(); showUpdated();
+tick();
+setInterval(tick, 60000);   // প্রতি মিনিটে চেক, ৩০ মিনিট পার হলে আপডেট
 </script>
 </body>
 </html>
