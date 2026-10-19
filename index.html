@@ -11,17 +11,13 @@
         header h1 { color: #ff0000; font-size: 2.5rem; margin-bottom: 10px; }
         header p { color: #aaa; }
         
-        .category-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
-        .category-btn { background: #2f2f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 1rem; transition: background 0.3s; }
-        .category-btn.active, .category-btn:hover { background: #ff0000; }
-
         .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
         .video-card { background: #1f1f1f; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; }
         .thumbnail-container { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
         .thumbnail-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         .video-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .video-title { font-size: 1.1rem; font-weight: bold; line-height: 1.4; margin-bottom: 8px; color: #f1f1f1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .video-category { font-size: 0.85rem; color: #aaa; font-weight: bold; margin-bottom: 15px; }
+        .video-category { font-size: 0.85rem; color: #ff0000; font-weight: bold; margin-bottom: 15px; }
         
         .watch-btn { display: block; width: 100%; text-align: center; background: #ff0000; color: #fff; text-decoration: none; padding: 10px; border-radius: 5px; font-weight: bold; transition: background 0.2s; }
         .watch-btn:hover { background: #cc0000; }
@@ -34,74 +30,79 @@
         <p>কোনো লগইন ছাড়াই সুপার ফাস্ট স্পিডে হিন্দি, ইংলিশ, তামিল সিনেমা, ভিডিও গান এবং নাটক দেখুন</p>
     </header>
 
-    <div class="category-container">
-        <button class="category-btn active" onclick="filterVideos('all', event)">সব ভিডিও</button>
-        <button class="category-btn" onclick="filterVideos('natok', event)">জনপ্রিয় নাটক</button>
-        <button class="category-btn" onclick="filterVideos('cinema', event)">হিন্দি/ইংলিশ/তামিল সিনেমা</button>
-        <button class="category-btn" onclick="filterVideos('song', event)">হিট ভিডিও গান</button>
-    </div>
+    <main class="video-grid">
 
-    <main class="video-grid" id="videoGrid"></main>
+        <!-- ১. এভেঞ্জার্স মুভি ক্লিপ -->
+        <div class="video-card">
+            <div class="thumbnail-container">
+                <img src="https://youtube.com" alt="Avengers">
+            </div>
+            <div class="video-info">
+                <div>
+                    <div class="video-title">AVENGERS: ENDGAME - Official Movie Clip</div>
+                    <div class="video-category">ক্যাটাগরি: সিনেমা</div>
+                </div>
+                <a href="https://youtube.com" target="_blank" class="watch-btn">ভিডিও দেখুন</a>
+            </div>
+        </div>
 
-    <script>
-        // সচল এবং ভেরিফাইড ভিডিও ডেটাবেজ
-        const videoData = [
-            { id: "TcMBFSGVi4A", title: "AVENGERS: ENDGAME - Official Movie Clip", category: "cinema" },
-            { id: "Cdh6n6V0aDw", title: "JAWAN - Shah Rukh Khan | Blockbuster Full Action Scene", category: "cinema" },
-            { id: "t9y4S6e2-2s", title: "KGF: CHAPTER 2 - Yash | Superhit South Action Movie", category: "cinema" },
-            { id: "M5uInwX8W0M", title: "ব্যাচেলর পয়েন্ট | সিজন ৪ | পর্ব ০১", category: "natok" },
-            { id: "f48_TIn6U60", title: "ফিমেল ৪ (Female 4) | নতুন বাংলা ব্লকবাস্টার নাটক", category: "natok" },
-            { id: "hUxO67zE6cM", title: "Arabic Kuthu Video Song - Beast | Vijay & Pooja Hegde", category: "song" },
-            { id: "hq3G1vE8mDw", title: "Calm Down - Rema & Selena Gomez Music Video", category: "song" }
-        ];
+        <!-- ২. জাওয়ান মুভি সিন -->
+        <div class="video-card">
+            <div class="thumbnail-container">
+                <img src="https://youtube.com" alt="Jawan">
+            </div>
+            <div class="video-info">
+                <div>
+                    <div class="video-title">JAWAN - Shah Rukh Khan | Blockbuster Full Action Scene</div>
+                    <div class="video-category">ক্যাটাগরি: সিনেমা</div>
+                </div>
+                <a href="https://youtube.com" target="_blank" class="watch-btn">ভিডিও দেখুন</a>
+            </div>
+        </div>
 
-        const videoGrid = document.getElementById('videoGrid');
+        <!-- ৩. কেজিএফ চ্যাপ্টার ২ -->
+        <div class="video-card">
+            <div class="thumbnail-container">
+                <img src="https://youtube.com" alt="KGF 2">
+            </div>
+            <div class="video-info">
+                <div>
+                    <div class="video-title">KGF: CHAPTER 2 - Yash | Superhit South Action Movie</div>
+                    <div class="video-category">ক্যাটাগরি: সিনেমা</div>
+                </div>
+                <a href="https://youtube.com" target="_blank" class="watch-btn">ভিডিও দেখুন</a>
+            </div>
+        </div>
 
-        function displayVideos(videos) {
-            let htmlContent = '';
-            for (let i = 0; i < videos.length; i++) {
-                let video = videos[i];
-                let catText = 'গান';
-                if (video.category === 'cinema') { catText = 'সিনেমা'; }
-                if (video.category === 'natok') { catText = 'নাটক'; }
+        <!-- ৪. ব্যাচেলর পয়েন্ট নাটক -->
+        <div class="video-card">
+            <div class="thumbnail-container">
+                <img src="https://youtube.com" alt="Bachelor Point">
+            </div>
+            <div class="video-info">
+                <div>
+                    <div class="video-title">ব্যাচেলর পয়েন্ট | সিজন ৪ | পর্ব ০১</div>
+                    <div class="video-category">ক্যাটাগরি: নাটক</div>
+                </div>
+                <a href="https://youtube.com" target="_blank" class="watch-btn">ভিডিও দেখুন</a>
+            </div>
+        </div>
 
-                // এখানে স্ট্রিং কনক্যাটিনেশন ব্যবহার করা হয়েছে যাতে কোনো ব্রাউজারে ফরম্যাট ভুল না হয়
-                htmlContent += '<div class="video-card">' +
-                    '<div class="thumbnail-container">' +
-                        '<img src="https://youtube.com' + video.id + '/mqdefault.jpg" alt="' + video.title + '">' +
-                    '</div>' +
-                    '<div class="video-info">' +
-                        '<div>' +
-                            '<div class="video-title">' + video.title + '</div>' +
-                            '<div class="video-category">ক্যাটাগরি: ' + catText + '</div>' +
-                        '</div>' +
-                        '<a href="https://youtube.com' + video.id + '" target="_blank" class="watch-btn">ভিဒီও দেখুন</a>' +
-                    '</div>' +
-                '</div>';
-            }
-            videoGrid.innerHTML = htmlContent;
-        }
+        <!-- ৫. অ্যারাবিক কুথু গান -->
+        <div class="video-card">
+            <div class="thumbnail-container">
+                <img src="https://youtube.com" alt="Arabic Kuthu">
+            </div>
+            <div class="video-info">
+                <div>
+                    <div class="video-title">Arabic Kuthu Video Song - Beast | Vijay & Pooja Hegde</div>
+                    <div class="video-category">ক্যাটাগরি: গান</div>
+                </div>
+                <a href="https://youtube.com" target="_blank" class="watch-btn">ভিডিও দেখুন</a>
+            </div>
+        </div>
 
-        function filterVideos(category, event) {
-            const buttons = document.querySelectorAll('.category-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+    </main>
 
-            if (category === 'all') {
-                displayVideos(videoData);
-            } else {
-                const filtered = [];
-                for (let i = 0; i < videoData.length; i++) {
-                    if (videoData[i].category === category) {
-                        filtered.push(videoData[i]);
-                    }
-                }
-                displayVideos(filtered);
-            }
-        }
-
-        // প্রথমবার পেজ লোড
-        displayVideos(videoData);
-    </script>
 </body>
 </html>
