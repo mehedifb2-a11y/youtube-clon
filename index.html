@@ -56,20 +56,15 @@
     </div>
 
     <script>
-        // আসল এবং ১০০% সচল ইউটিউব ভিডিও আইডি দিয়ে আপডেট করা লিস্ট
+        // আসল এবং সচল ভিডিও আইডি
         const videoData = [
-            // === সিনেমা ===
-            { id: "TcMBFSGVi4A", title: "AVENGERS: ENDGAME - অফিশিয়াল মুভি ট্রেইলার / স্পেশাল ক্লিপ", category: "cinema" },
-            { id: "Cdh6n6V0aDw", title: "JAWAN - শাহরুখ খান | ব্লকবাস্টার ফুল অ্যাকশন মুভি ক্লিপ", category: "cinema" },
-            { id: "t9y4S6e2-2s", title: "KGF: CHAPTER 2 - ইয়াশ | সুপারহিট তামিল/সাউথ ইন্ডিয়ান অ্যাকশন মুভি", category: "cinema" },
-            
-            // === নাটক ===
+            { id: "TcMBFSGVi4A", title: "AVENGERS: ENDGAME - Official Movie Clip", category: "cinema" },
+            { id: "Cdh6n6V0aDw", title: "JAWAN - Shah Rukh Khan | Blockbuster Full Action Scene", category: "cinema" },
+            { id: "t9y4S6e2-2s", title: "KGF: CHAPTER 2 - Yash | Superhit South Action Movie", category: "cinema" },
             { id: "M5uInwX8W0M", title: "ব্যাচেলর পয়েন্ট | সিজন ৪ | পর্ব ০১", category: "natok" },
-            { id: "N61W4L3Qz9s", title: "ফিমেল ৪ (Female 4) | নতুন বাংলা ব্লকবাস্টার নাটক", category: "natok" },
-            
-            // === গান ===
-            { id: "hUxO67zE6cM", title: "Arabic Kuthu Video Song - বিজয় ও পূজা হেগড়ে | হিট গান", category: "song" },
-            { id: "hq3G1vE8mDw", title: "Calm Down - বিশ্বসেরা ভাইরাল ভিডিও গান", category: "song" }
+            { id: "f48_TIn6U60", title: "ফিমেল ৪ (Female 4) | নতুন বাংলা ব্লকবাস্টার নাটক", category: "natok" },
+            { id: "hUxO67zE6cM", title: "Arabic Kuthu Video Song - Beast | Vijay & Pooja Hegde", category: "song" },
+            { id: "hq3G1vE8mDw", title: "Calm Down - Rema & Selena Gomez Music Video", category: "song" }
         ];
 
         const videoGrid = document.getElementById('videoGrid');
@@ -104,8 +99,9 @@
             }
         }
 
+        // লিঙ্কের লেখার স্টাইল পরিবর্তন করা হলো যাতে ব্রাউজার ভুল করতে না পারে
         function playVideo(videoId) {
-            playerContainer.innerHTML = `<iframe src="https://youtube.com{videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            playerContainer.innerHTML = '<iframe src="https://youtube.com' + videoId + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
             videoModal.style.display = 'flex';
         }
 
