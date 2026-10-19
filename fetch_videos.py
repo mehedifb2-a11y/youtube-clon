@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timedelta
 
 # কনফিগারেশন
-API_KEY = os.getenv("YOUTUBE_API_KEY")
+API_KEY = os.getenv("AIzaSyCQf9y6FyB1lrxFGNU8cdwBhyuww5bzkiI")
 DATA_FILE = "videos.json"
 
 # আপনি যে যে বিষয়ের ভিডিও আপনার ওয়েবসাইটে চান, সেই কিওয়ার্ডগুলো এখানে লিখুন
