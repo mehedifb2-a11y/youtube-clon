@@ -144,7 +144,7 @@
 </div>
 
 <script>
-const API_KEY = "AIzaSyDINOtzZgA0UjnkVeSowUutcI2OC9Sjc_0";   // এখানে আপনার নতুন YouTube API Key বসান
+const API_KEY = "AIzaSyDINOtzZgA0UjnkVeSowUutcI2OC9Sjc_0";   // এখানে আপনার YouTube API Key বসান
 const REFRESH_MIN = 240;          // কত মিনিট পর পর সব ক্যাটাগরি আপডেট (৪ ঘণ্টা = দিনে ৬ বার)
 const DAILY_BUDGET = 9000;        // দিনে সর্বোচ্চ কোটা খরচ (১০,০০০ এর নিচে নিরাপদ সীমা)
 const KEEP_DAYS = 60;             // ৬০ দিন পর অটো ডিলিট
@@ -154,7 +154,21 @@ const PAGE = 24;
 const CATS = [
   { key: "hindi",    grp: "সিনেমা",     ic: "🎬", name: "হিন্দি সিনেমা",            long: true,  minSec: 2400, queries: ["hindi full movie", "bollywood full movie hd"] },
   { key: "english",  grp: "সিনেমা",     ic: "🍿", name: "ইংলিশ সিনেমা",            long: true,  minSec: 2400, queries: ["english full movie", "hollywood full movie hd"] },
-  { key: "tamil",    grp: "সিনেমা",     ic: "🎞️", name: "তামিল সিনেমা",            long: true,  minSec: 2400, queries: ["tamil full movie", "tamil movie hd"] },
+  { key: "cartoon",  grp: "শিশুদের",     ic: "🧸", name: "কার্টুন",                 long: false, minSec: 120,  strict: true,
+    queries: [
+      "বাংলা শিক্ষামূলক কার্টুন শিশুদের জন্য",
+      "bangla cartoon for kids educational",
+      "বাংলা ছড়া শিশুদের নার্সারি রাইম",
+      "bangla nursery rhymes for kids",
+      "বাংলা বর্ণমালা শেখা শিশুদের জন্য",
+      "bangla alphabet learning for kids",
+      "ছোটদের নীতিকথা গল্প কার্টুন",
+      "bangla moral story cartoon for children",
+      "বাংলা ছোটদের রূপকথার গল্প কার্টুন",
+      "bangla counting numbers learning kids",
+      "বাংলা ছোটদের ইসলামিক শিক্ষামূলক কার্টুন",
+      "kids learning bangla animation"
+    ] },
   { key: "bnmovie",  grp: "সিনেমা",     ic: "🎥", name: "বাংলা সিনেমা",            long: true,  minSec: 2400, queries: ["bangla full movie", "bengali movie hd"] },
   { key: "tamildub", grp: "ডাবিং",      ic: "🗣️", name: "তামিল বাংলা ডাবিং",       long: true,  minSec: 2400, queries: ["tamil movie bangla dubbed full movie", "south indian bangla dubbed movie"] },
   { key: "otherdub", grp: "ডাবিং",      ic: "🌐", name: "হিন্দি/ইংলিশ বাংলা ডাবিং", long: true,  minSec: 2400, queries: ["hindi movie bangla dubbed full movie", "hollywood bangla dubbed full movie"] },
@@ -162,17 +176,16 @@ const CATS = [
   { key: "telugu",   grp: "ডাবিং",      ic: "🔥", name: "তেলেগু হিন্দি ডাবিং",     long: true,  minSec: 2400, queries: ["telugu movie hindi dubbed full movie", "telugu action hindi dubbed movie"] },
   { key: "natok",    grp: "নাটক ও গান", ic: "📺", name: "বাংলা নাটক",              long: false, minSec: 600,  queries: ["bangla natok", "bangla new natok 2026"] },
   { key: "gopal",    grp: "নাটক ও গান", ic: "😂", name: "গোপালভাঁড়",              long: false, minSec: 300,  queries: ["gopal bhar bangla", "গোপাল ভাঁড়"] },
-  { key: "song", grp: "নাটক ও গান", ic: "🎵", name: "ভিডিও গান", long: false, minSec: 90,
-  queries: [
-    "new bangla song official video",
-    "নতুন বাংলা গান",
-    "new hindi song official video",
-    "new tamil song official video",
-    "new bhojpuri song official video",
-    "new punjabi song official video",
-    "new telugu song official video"
-  ]
-},
+  { key: "song",     grp: "নাটক ও গান", ic: "🎵", name: "ভিডিও গান",               long: false, minSec: 90,
+    queries: [
+      "new bangla song official video",
+      "নতুন বাংলা গান",
+      "new hindi song official video",
+      "new tamil song official video",
+      "new bhojpuri song official video",
+      "new punjabi song official video",
+      "new telugu song official video"
+    ] },
   { key: "lofi",     grp: "নাটক ও গান", ic: "🎧", name: "Lo-Fi গান",               long: false, minSec: 120,  queries: ["bangla lofi song", "bengali lofi mashup", "বাংলা লোফি গান", "bangla lofi slowed reverb"] },
   { key: "found",    grp: null,         ic: "🔎", name: "সার্চ রেজাল্ট",            long: false, minSec: 0,    queries: [] }
 ];
@@ -191,6 +204,7 @@ function saveStore(key, arr) {
     arr = arr.slice(0, Math.floor(arr.length / 2));
   }
 }
+try { localStorage.removeItem("vh_tamil"); } catch {}   // পুরনো তামিল সিনেমার ক্যাশ মুছে ফেলা
 const store = {};
 CATS.forEach(c => store[c.key] = lsGet("vh_" + c.key, []));
 const meta = Object.assign({ last: 0, rr: 0, block: 0, qDay: "", qUsed: 0 }, lsGet("vh_meta", {}));
@@ -252,6 +266,7 @@ function mergeInto(key, items, det, minSec) {
 async function fetchInto(cat, q) {
   const p = { q, order: "date" };
   if (cat.long) p.videoDuration = "long";
+  if (cat.strict) p.safeSearch = "strict";   // শিশুদের জন্য কড়া সেফ সার্চ
   const { items, det } = await searchItems(p);
   return mergeInto(cat.key, items, det, cat.minSec);
 }
