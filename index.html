@@ -12,7 +12,6 @@
   body { background: #0f0f0f; color: #fff; }
   a { color: inherit; }
 
-  /* ---------- হেডার ---------- */
   header { position: sticky; top: 0; z-index: 20; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: #0f0f0f; border-bottom: 1px solid #272727; }
   #menu { flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: #fff; cursor: pointer; display: grid; place-items: center; }
   #menu:hover { background: #272727; }
@@ -26,7 +25,6 @@
   #sb { width: 60px; background: #222; border: 1px solid #303030; color: #fff; border-radius: 0 22px 22px 0; cursor: pointer; font-size: 1.05rem; }
   #sb:hover { background: #303030; }
 
-  /* ---------- বাম সাইডবার ---------- */
   .sidebar { position: fixed; top: 56px; left: 0; bottom: 0; width: 240px; background: #0f0f0f; border-right: 1px solid #1f1f1f; overflow-y: auto; padding: 12px 10px 30px; z-index: 30; transform: translateX(-100%); transition: transform .22s ease; scrollbar-width: thin; scrollbar-color: #333 transparent; }
   body.sbshow .sidebar { transform: none; }
   .backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 25; }
@@ -42,9 +40,8 @@
   .sitem .cnt { font-size: .7rem; color: #999; background: #1c1c1c; border-radius: 10px; padding: 2px 7px; flex: none; }
   .sitem.active .cnt { background: #444; color: #fff; }
 
-  /* ---------- হোম ---------- */
   .page { padding: 16px; transition: margin-left .22s ease; }
-  #upd { max-width: 1400px; margin: 0 auto 14px; color: #888; font-size: .8rem; }
+  #upd { max-width: 1400px; margin: 0 auto 14px; color: #888; font-size: .8rem; line-height: 1.6; }
   #heading { max-width: 1400px; margin: 0 auto 14px; font-size: 1.15rem; font-weight: 700; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px 16px; max-width: 1400px; margin: 0 auto; }
   .card { cursor: pointer; }
@@ -68,7 +65,6 @@
     .backdrop { z-index: 35; }
   }
 
-  /* ---------- প্লে পেজ ---------- */
   .watch { display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-areas: "player related" "meta related"; grid-template-rows: auto 1fr; gap: 16px 24px; max-width: 1700px; margin: 0 auto; padding: 20px; }
   .pwrap { grid-area: player; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; width: 100%; }
   .pwrap iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -127,7 +123,6 @@
 <nav class="sidebar" id="sidebar" aria-label="ক্যাটাগরি"></nav>
 <div class="backdrop" id="backdrop"></div>
 
-<!-- হোম -->
 <div id="home" class="page">
   <div id="upd">লোড হচ্ছে...</div>
   <div id="heading" hidden></div>
@@ -136,7 +131,6 @@
   <button class="btn" id="more" hidden>আরও দেখুন</button>
 </div>
 
-<!-- প্লে পেজ -->
 <div id="watch" class="watch" hidden>
   <div class="pwrap">
     <iframe id="player" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
@@ -150,27 +144,27 @@
 </div>
 
 <script>
-const API_KEY = "AIzaSyDINOtzZgA0UjnkVeSowUutcI2OC9Sjc_0";   // এখানে নতুন YouTube API Key বসান
-const REFRESH_MIN = 40;           // কত মিনিট পর পর নতুন ভিডিও আনবে
+const API_KEY = "AIzaSyDINOtzZgA0UjnkVeSowUutcI2OC9Sjc_0";   // এখানে আপনার নতুন YouTube API Key বসান
+const REFRESH_MIN = 240;          // কত মিনিট পর পর সব ক্যাটাগরি আপডেট (৪ ঘণ্টা = দিনে ৬ বার)
+const DAILY_BUDGET = 9000;        // দিনে সর্বোচ্চ কোটা খরচ (১০,০০০ এর নিচে নিরাপদ সীমা)
 const KEEP_DAYS = 60;             // ৬০ দিন পর অটো ডিলিট
 const MAX_PER_CAT = 1500;         // প্রতি ক্যাটাগরিতে সর্বোচ্চ ভিডিও
 const PAGE = 24;
 
-// grp = সাইডবারে কোন গ্রুপে দেখাবে, ic = আইকন
 const CATS = [
-  { key: "hindi",    grp: "সিনেমা",         ic: "🎬", name: "হিন্দি সিনেমা",            long: true,  minSec: 2400, queries: ["hindi full movie", "bollywood full movie hd"] },
-  { key: "english",  grp: "সিনেমা",         ic: "🍿", name: "ইংলিশ সিনেমা",            long: true,  minSec: 2400, queries: ["english full movie", "hollywood full movie hd"] },
-  { key: "tamil",    grp: "সিনেমা",         ic: "🎞️", name: "তামিল সিনেমা",            long: true,  minSec: 2400, queries: ["tamil full movie", "tamil movie hd"] },
-  { key: "bnmovie",  grp: "সিনেমা",         ic: "🎥", name: "বাংলা সিনেমা",            long: true,  minSec: 2400, queries: ["bangla full movie", "bengali movie hd"] },
-  { key: "tamildub", grp: "ডাবিং",          ic: "🗣️", name: "তামিল বাংলা ডাবিং",       long: true,  minSec: 2400, queries: ["tamil movie bangla dubbed full movie", "south indian bangla dubbed movie"] },
-  { key: "otherdub", grp: "ডাবিং",          ic: "🌐", name: "হিন্দি/ইংলিশ বাংলা ডাবিং", long: true,  minSec: 2400, queries: ["hindi movie bangla dubbed full movie", "hollywood bangla dubbed full movie"] },
-  { key: "tamilhi",  grp: "ডাবিং",          ic: "💥", name: "তামিল হিন্দি ডাবিং",      long: true,  minSec: 2400, queries: ["tamil movie hindi dubbed full movie", "south tamil action hindi dubbed movie"] },
-  { key: "telugu",   grp: "ডাবিং",          ic: "🔥", name: "তেলেগু হিন্দি ডাবিং",     long: true,  minSec: 2400, queries: ["telugu movie hindi dubbed full movie", "telugu action hindi dubbed movie"] },
-  { key: "natok",    grp: "নাটক ও গান",     ic: "📺", name: "বাংলা নাটক",              long: false, minSec: 600,  queries: ["bangla natok", "bangla new natok 2026"] },
-  { key: "gopal",    grp: "নাটক ও গান",     ic: "😂", name: "গোপালভাঁড়",              long: false, minSec: 300,  queries: ["gopal bhar bangla", "গোপাল ভাঁড়"] },
-  { key: "song",     grp: "নাটক ও গান",     ic: "🎵", name: "ভিডিও গান",               long: false, minSec: 90,   queries: ["official video song", "new bangla song"] },
-  { key: "lofi",     grp: "নাটক ও গান",     ic: "🎧", name: "Lo-Fi গান",               long: false, minSec: 120,  queries: ["bangla lofi song", "bengali lofi mashup", "বাংলা লোফি গান", "bangla lofi slowed reverb"] },
-  { key: "found",    grp: null,             ic: "🔎", name: "সার্চ রেজাল্ট",            long: false, minSec: 0,    queries: [] }
+  { key: "hindi",    grp: "সিনেমা",     ic: "🎬", name: "হিন্দি সিনেমা",            long: true,  minSec: 2400, queries: ["hindi full movie", "bollywood full movie hd"] },
+  { key: "english",  grp: "সিনেমা",     ic: "🍿", name: "ইংলিশ সিনেমা",            long: true,  minSec: 2400, queries: ["english full movie", "hollywood full movie hd"] },
+  { key: "tamil",    grp: "সিনেমা",     ic: "🎞️", name: "তামিল সিনেমা",            long: true,  minSec: 2400, queries: ["tamil full movie", "tamil movie hd"] },
+  { key: "bnmovie",  grp: "সিনেমা",     ic: "🎥", name: "বাংলা সিনেমা",            long: true,  minSec: 2400, queries: ["bangla full movie", "bengali movie hd"] },
+  { key: "tamildub", grp: "ডাবিং",      ic: "🗣️", name: "তামিল বাংলা ডাবিং",       long: true,  minSec: 2400, queries: ["tamil movie bangla dubbed full movie", "south indian bangla dubbed movie"] },
+  { key: "otherdub", grp: "ডাবিং",      ic: "🌐", name: "হিন্দি/ইংলিশ বাংলা ডাবিং", long: true,  minSec: 2400, queries: ["hindi movie bangla dubbed full movie", "hollywood bangla dubbed full movie"] },
+  { key: "tamilhi",  grp: "ডাবিং",      ic: "💥", name: "তামিল হিন্দি ডাবিং",      long: true,  minSec: 2400, queries: ["tamil movie hindi dubbed full movie", "south tamil action hindi dubbed movie"] },
+  { key: "telugu",   grp: "ডাবিং",      ic: "🔥", name: "তেলেগু হিন্দি ডাবিং",     long: true,  minSec: 2400, queries: ["telugu movie hindi dubbed full movie", "telugu action hindi dubbed movie"] },
+  { key: "natok",    grp: "নাটক ও গান", ic: "📺", name: "বাংলা নাটক",              long: false, minSec: 600,  queries: ["bangla natok", "bangla new natok 2026"] },
+  { key: "gopal",    grp: "নাটক ও গান", ic: "😂", name: "গোপালভাঁড়",              long: false, minSec: 300,  queries: ["gopal bhar bangla", "গোপাল ভাঁড়"] },
+  { key: "song",     grp: "নাটক ও গান", ic: "🎵", name: "ভিডিও গান",               long: false, minSec: 90,   queries: ["official video song", "new bangla song"] },
+  { key: "lofi",     grp: "নাটক ও গান", ic: "🎧", name: "Lo-Fi গান",               long: false, minSec: 120,  queries: ["bangla lofi song", "bengali lofi mashup", "বাংলা লোফি গান", "bangla lofi slowed reverb"] },
+  { key: "found",    grp: null,         ic: "🔎", name: "সার্চ রেজাল্ট",            long: false, minSec: 0,    queries: [] }
 ];
 
 const DAY = 864e5;
@@ -189,9 +183,19 @@ function saveStore(key, arr) {
 }
 const store = {};
 CATS.forEach(c => store[c.key] = lsGet("vh_" + c.key, []));
-const meta = lsGet("vh_meta", { last: 0, rr: 0, block: 0 });
+const meta = Object.assign({ last: 0, rr: 0, block: 0, qDay: "", qUsed: 0 }, lsGet("vh_meta", {}));
 const saveMeta = () => lsSet("vh_meta", meta);
 let sq = lsGet("vh_sq", {});
+
+// ---------- কোটা গার্ড ----------
+const todayPT = () => new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+function quotaLeft() {
+  if (meta.qDay !== todayPT()) { meta.qDay = todayPT(); meta.qUsed = 0; saveMeta(); }
+  return DAILY_BUDGET - meta.qUsed;
+}
+function spend(n) { quotaLeft(); meta.qUsed += n; saveMeta(); }
+const SEARCH_COST = 101;   // ১টা সার্চ (১০০) + ডিটেইলস (১)
+function budgetError() { const e = new Error("budget"); e.budget = true; return e; }
 
 // ---------- YouTube API ----------
 const decode = s => { const t = document.createElement("textarea"); t.innerHTML = s; return t.value; };
@@ -200,6 +204,7 @@ const toSec = iso => {
   return (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0);
 };
 async function yt(path, params) {
+  spend(path === "search" ? 100 : 1);
   const u = new URL("https://www.googleapis.com/youtube/v3/" + path);
   for (const [k, v] of Object.entries({ ...params, key: API_KEY })) u.searchParams.set(k, v);
   const j = await (await fetch(u)).json();
@@ -207,6 +212,7 @@ async function yt(path, params) {
   return j;
 }
 async function searchItems(p) {
+  if (quotaLeft() < SEARCH_COST) throw budgetError();
   const j = await yt("search", { part: "snippet", type: "video", maxResults: 50, videoEmbeddable: "true", safeSearch: "moderate", ...p });
   const items = j.items.map(it => ({ id: it.id.videoId, t: decode(it.snippet.title),
                                      c: decode(it.snippet.channelTitle), p: it.snippet.publishedAt }));
@@ -246,16 +252,18 @@ async function safely(fn) {
   if (busy) return;
   if (API_KEY === "YOUR_API_KEY") { statusEl.textContent = "কোডে আপনার YouTube API Key বসান।"; return; }
   if (Date.now() < meta.block) return;
+  if (quotaLeft() < SEARCH_COST) { statusEl.textContent = `আজকের কোটা সীমা (${DAILY_BUDGET}) পূর্ণ। ক্যাশ থেকে দেখানো হচ্ছে, কাল আবার আপডেট হবে।`; return; }
   busy = true;
   try { await fn(); }
   catch (e) {
-    if (e.quota) { meta.block = Date.now() + 3600e3; saveMeta(); statusEl.textContent = "আজকের API কোটা শেষ। ক্যাশ থেকে ভিডিও দেখানো হচ্ছে।"; }
+    if (e.budget) statusEl.textContent = `আজকের কোটা সীমা (${DAILY_BUDGET}) পূর্ণ। ক্যাশ থেকে দেখানো হচ্ছে।`;
+    else if (e.quota) { meta.block = Date.now() + 3600e3; saveMeta(); statusEl.textContent = "আজকের API কোটা শেষ। ক্যাশ থেকে ভিডিও দেখানো হচ্ছে।"; }
     else statusEl.textContent = "API সমস্যা: " + e.message;
   }
   busy = false;
   rebuild(); refreshHome(); showUpdated();
 }
-async function fillEmpty() {
+async function fillEmpty() {            // প্রথমবার: খালি ক্যাটাগরি ভরে
   for (const c of CATS) {
     if (!c.queries.length || store[c.key].length) continue;
     statusEl.textContent = `${c.name} লোড হচ্ছে...`;
@@ -265,13 +273,17 @@ async function fillEmpty() {
   }
   statusEl.textContent = "";
 }
-async function refreshNext() {
+async function refreshNext() {          // প্রতি আপডেটে সব ক্যাটাগরি একসাথে
   const real = CATS.filter(c => c.queries.length);
-  const c = real[meta.rr % real.length];
-  const q = c.queries[Math.floor(meta.rr / real.length) % c.queries.length];
-  meta.rr++;
-  await fetchInto(c, q);
-  meta.last = Date.now(); saveMeta();
+  let complete = true;
+  for (const c of real) {
+    if (quotaLeft() < SEARCH_COST) { complete = false; break; }
+    const q = c.queries[meta.rr % c.queries.length];
+    try { await fetchInto(c, q); }
+    catch (e) { if (e.quota || e.budget) throw e; console.log(c.name, e.message); }
+    rebuild(); refreshHome();           // প্রতিটা শেষ হলেই নতুন ভিডিও দেখায়
+  }
+  if (complete) { meta.rr++; meta.last = Date.now(); saveMeta(); }
 }
 function tick() {
   const needFill = CATS.some(c => c.queries.length && !store[c.key].length);
@@ -298,7 +310,9 @@ function rebuild() {
 }
 function showUpdated() {
   const mins = meta.last ? Math.round((Date.now() - meta.last) / 60000) : null;
-  $("upd").textContent = `${all.length} টি ভিডিও` + (mins == null ? "" : ` • শেষ আপডেট ${mins} মিনিট আগে`);
+  quotaLeft();
+  $("upd").textContent = `${all.length} টি ভিডিও` + (mins == null ? "" : ` • শেষ আপডেট ${mins} মিনিট আগে`) +
+    ` • আজ কোটা খরচ ~${meta.qUsed}/${DAILY_BUDGET}`;
 }
 
 // ---------- সাইডবার ----------
@@ -407,7 +421,8 @@ async function doSearch(q) {
   else {
     try { res = await liveSearch(q); }
     catch (e) {
-      if (e.quota) { meta.block = Date.now() + 3600e3; saveMeta(); note = "API কোটা শেষ, ক্যাশ থেকে খোঁজা হয়েছে।"; }
+      if (e.budget) note = "আজকের কোটা সীমা পূর্ণ, ক্যাশ থেকে খোঁজা হয়েছে।";
+      else if (e.quota) { meta.block = Date.now() + 3600e3; saveMeta(); note = "API কোটা শেষ, ক্যাশ থেকে খোঁজা হয়েছে।"; }
       else note = "API সমস্যা: " + e.message;
       res = localSearch(q);
     }
