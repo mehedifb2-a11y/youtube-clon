@@ -12,28 +12,41 @@
   body { background: #0f0f0f; color: #fff; }
   a { color: inherit; }
 
-  /* ---------- হেডার ও লোগো ---------- */
-  header { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: #0f0f0f; border-bottom: 1px solid #272727; }
+  /* ---------- হেডার ---------- */
+  header { position: sticky; top: 0; z-index: 20; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; background: #0f0f0f; border-bottom: 1px solid #272727; }
+  #menu { flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: #fff; cursor: pointer; display: grid; place-items: center; }
+  #menu:hover { background: #272727; }
   .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex: none; }
   .logo svg { display: block; filter: drop-shadow(0 2px 6px rgba(232,0,31,.45)); }
-  .wm { font-size: 1.55rem; font-weight: 800; letter-spacing: -1px; line-height: 1; display: flex; flex-direction: column; }
-  .wm small { font-size: .52rem; font-weight: 600; letter-spacing: 2.2px; color: #aaa; text-transform: uppercase; margin-top: 3px; }
+  .wm { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; line-height: 1; display: flex; flex-direction: column; }
+  .wm small { font-size: .5rem; font-weight: 600; letter-spacing: 2.2px; color: #aaa; text-transform: uppercase; margin-top: 3px; }
   #sf { flex: 1; display: flex; max-width: 640px; margin: 0 auto; min-width: 0; }
-  #q { flex: 1; min-width: 0; padding: 10px 16px; border: 1px solid #303030; border-right: 0; background: #121212; color: #fff; border-radius: 22px 0 0 22px; outline: none; font-size: 1rem; }
+  #q { flex: 1; min-width: 0; padding: 9px 16px; border: 1px solid #303030; border-right: 0; background: #121212; color: #fff; border-radius: 22px 0 0 22px; outline: none; font-size: 1rem; }
   #q:focus { border-color: #1c62b9; }
   #sb { width: 60px; background: #222; border: 1px solid #303030; color: #fff; border-radius: 0 22px 22px 0; cursor: pointer; font-size: 1.05rem; }
   #sb:hover { background: #303030; }
 
+  /* ---------- বাম সাইডবার ---------- */
+  .sidebar { position: fixed; top: 56px; left: 0; bottom: 0; width: 240px; background: #0f0f0f; border-right: 1px solid #1f1f1f; overflow-y: auto; padding: 12px 10px 30px; z-index: 30; transform: translateX(-100%); transition: transform .22s ease; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+  body.sbshow .sidebar { transform: none; }
+  .backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 25; }
+  body.sbshow .backdrop { display: block; }
+  .sgroup { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #272727; }
+  .sgroup:last-child { border-bottom: 0; }
+  .sgroup h4 { font-size: .75rem; color: #888; letter-spacing: .5px; padding: 8px 12px 6px; font-weight: 600; }
+  .sitem { width: 100%; display: flex; align-items: center; gap: 14px; padding: 9px 12px; border: 0; border-radius: 10px; background: transparent; color: #fff; cursor: pointer; font-size: .93rem; text-align: left; }
+  .sitem:hover { background: #272727; }
+  .sitem.active { background: #2e2e2e; font-weight: 700; box-shadow: inset 3px 0 0 #e8001f; }
+  .sitem .ic { width: 24px; text-align: center; font-size: 1.2rem; flex: none; }
+  .sitem .nm { flex: 1; min-width: 0; line-height: 1.25; }
+  .sitem .cnt { font-size: .7rem; color: #999; background: #1c1c1c; border-radius: 10px; padding: 2px 7px; flex: none; }
+  .sitem.active .cnt { background: #444; color: #fff; }
+
   /* ---------- হোম ---------- */
-  .page { padding: 16px; }
-  #tabs { max-width: 1400px; margin: 0 auto 10px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
-  #tabs::-webkit-scrollbar { display: none; }
-  .tab { flex: none; background: #272727; color: #fff; border: 0; padding: 8px 15px; border-radius: 9px; cursor: pointer; font-weight: 600; font-size: .9rem; }
-  .tab:hover { background: #3a3a3a; }
-  .tab.active { background: #fff; color: #000; }
+  .page { padding: 16px; transition: margin-left .22s ease; }
   #upd { max-width: 1400px; margin: 0 auto 14px; color: #888; font-size: .8rem; }
-  #heading { max-width: 1400px; margin: 0 auto 14px; font-size: 1.1rem; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 22px 16px; max-width: 1400px; margin: 0 auto; }
+  #heading { max-width: 1400px; margin: 0 auto 14px; font-size: 1.15rem; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px 16px; max-width: 1400px; margin: 0 auto; }
   .card { cursor: pointer; }
   .thumb { position: relative; aspect-ratio: 16/9; background: #1a1a1a; border-radius: 12px; overflow: hidden; }
   .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .2s; }
@@ -46,7 +59,16 @@
   .btn { display: block; margin: 22px auto; background: #272727; color: #fff; border: 1px solid #444; padding: 12px 30px; border-radius: 25px; cursor: pointer; }
   .btn:hover { background: #333; }
 
-  /* ---------- প্লে পেজ (ইউটিউব স্টাইল) ---------- */
+  @media (min-width: 1001px) {
+    body.sbshow:not(.watching) .page { margin-left: 240px; }
+    body.sbshow:not(.watching) .backdrop { display: none; }
+  }
+  @media (max-width: 1000px) {
+    .sidebar { top: 0; padding-top: 14px; z-index: 40; width: 270px; }
+    .backdrop { z-index: 35; }
+  }
+
+  /* ---------- প্লে পেজ ---------- */
   .watch { display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-areas: "player related" "meta related"; grid-template-rows: auto 1fr; gap: 16px 24px; max-width: 1700px; margin: 0 auto; padding: 20px; }
   .pwrap { grid-area: player; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; width: 100%; }
   .pwrap iframe { width: 100%; height: 100%; border: 0; display: block; }
@@ -69,8 +91,8 @@
   }
   @media (max-width: 700px) {
     body.watching header { position: static; }
-    header { padding: 8px 10px; gap: 8px; }
-    .wm { font-size: 1.3rem; }
+    header { padding: 0 8px; gap: 6px; }
+    .wm { font-size: 1.25rem; }
     .wm small { display: none; }
     #sb { width: 46px; }
     .page { padding: 12px; }
@@ -85,6 +107,9 @@
 <body>
 
 <header>
+  <button id="menu" aria-label="মেনু">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+  </button>
   <a class="logo" href="#" id="logo" aria-label="Habib হোম">
     <svg viewBox="0 0 48 34" width="42" height="30" aria-hidden="true">
       <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff3b3b"/><stop offset="1" stop-color="#c4001d"/></linearGradient></defs>
@@ -99,9 +124,11 @@
   </form>
 </header>
 
+<nav class="sidebar" id="sidebar" aria-label="ক্যাটাগরি"></nav>
+<div class="backdrop" id="backdrop"></div>
+
 <!-- হোম -->
 <div id="home" class="page">
-  <div id="tabs"></div>
   <div id="upd">লোড হচ্ছে...</div>
   <div id="heading" hidden></div>
   <main class="grid" id="grid"></main>
@@ -129,25 +156,27 @@ const KEEP_DAYS = 60;             // ৬০ দিন পর অটো ডিল
 const MAX_PER_CAT = 1500;         // প্রতি ক্যাটাগরিতে সর্বোচ্চ ভিডিও
 const PAGE = 24;
 
+// grp = সাইডবারে কোন গ্রুপে দেখাবে, ic = আইকন
 const CATS = [
-  { key: "hindi",    name: "হিন্দি সিনেমা",           long: true,  minSec: 2400, queries: ["hindi full movie", "bollywood full movie hd"] },
-  { key: "english",  name: "ইংলিশ সিনেমা",           long: true,  minSec: 2400, queries: ["english full movie", "hollywood full movie hd"] },
-  { key: "tamil",    name: "তামিল সিনেমা",           long: true,  minSec: 2400, queries: ["tamil full movie", "tamil movie hd"] },
-  { key: "tamildub", name: "তামিল বাংলা ডাবিং",      long: true,  minSec: 2400, queries: ["tamil movie bangla dubbed full movie", "south indian bangla dubbed movie"] },
-  { key: "tamilhi",  name: "তামিল হিন্দি ডাবিং",     long: true,  minSec: 2400, queries: ["tamil movie hindi dubbed full movie", "south tamil action hindi dubbed movie"] },
-  { key: "telugu",   name: "তেলেগু হিন্দি ডাবিং",    long: true,  minSec: 2400, queries: ["telugu movie hindi dubbed full movie", "telugu action hindi dubbed movie"] },
-  { key: "otherdub", name: "হিন্দি/ইংলিশ বাংলা ডাবিং", long: true, minSec: 2400, queries: ["hindi movie bangla dubbed full movie", "hollywood bangla dubbed full movie"] },
-  { key: "bnmovie",  name: "বাংলা সিনেমা",           long: true,  minSec: 2400, queries: ["bangla full movie", "bengali movie hd"] },
-  { key: "natok",    name: "বাংলা নাটক",             long: false, minSec: 600,  queries: ["bangla natok", "bangla new natok 2026"] },
-  { key: "gopal",    name: "গোপালভাঁড়",             long: false, minSec: 300,  queries: ["gopal bhar bangla", "গোপাল ভাঁড়"] },
-  { key: "song",     name: "ভিডিও গান",              long: false, minSec: 90,   queries: ["official video song", "new bangla song"] },
-    { key: "lofi",     name: "Lo-Fi গান",              long: false, minSec: 120,  queries: ["bangla lofi song", "bengali lofi mashup", "বাংলা লোফি গান", "bangla lofi slowed reverb"] },
-  { key: "found",    name: "সার্চ রেজাল্ট",           long: false, minSec: 0,    queries: [] }
+  { key: "hindi",    grp: "সিনেমা",         ic: "🎬", name: "হিন্দি সিনেমা",            long: true,  minSec: 2400, queries: ["hindi full movie", "bollywood full movie hd"] },
+  { key: "english",  grp: "সিনেমা",         ic: "🍿", name: "ইংলিশ সিনেমা",            long: true,  minSec: 2400, queries: ["english full movie", "hollywood full movie hd"] },
+  { key: "tamil",    grp: "সিনেমা",         ic: "🎞️", name: "তামিল সিনেমা",            long: true,  minSec: 2400, queries: ["tamil full movie", "tamil movie hd"] },
+  { key: "bnmovie",  grp: "সিনেমা",         ic: "🎥", name: "বাংলা সিনেমা",            long: true,  minSec: 2400, queries: ["bangla full movie", "bengali movie hd"] },
+  { key: "tamildub", grp: "ডাবিং",          ic: "🗣️", name: "তামিল বাংলা ডাবিং",       long: true,  minSec: 2400, queries: ["tamil movie bangla dubbed full movie", "south indian bangla dubbed movie"] },
+  { key: "otherdub", grp: "ডাবিং",          ic: "🌐", name: "হিন্দি/ইংলিশ বাংলা ডাবিং", long: true,  minSec: 2400, queries: ["hindi movie bangla dubbed full movie", "hollywood bangla dubbed full movie"] },
+  { key: "tamilhi",  grp: "ডাবিং",          ic: "💥", name: "তামিল হিন্দি ডাবিং",      long: true,  minSec: 2400, queries: ["tamil movie hindi dubbed full movie", "south tamil action hindi dubbed movie"] },
+  { key: "telugu",   grp: "ডাবিং",          ic: "🔥", name: "তেলেগু হিন্দি ডাবিং",     long: true,  minSec: 2400, queries: ["telugu movie hindi dubbed full movie", "telugu action hindi dubbed movie"] },
+  { key: "natok",    grp: "নাটক ও গান",     ic: "📺", name: "বাংলা নাটক",              long: false, minSec: 600,  queries: ["bangla natok", "bangla new natok 2026"] },
+  { key: "gopal",    grp: "নাটক ও গান",     ic: "😂", name: "গোপালভাঁড়",              long: false, minSec: 300,  queries: ["gopal bhar bangla", "গোপাল ভাঁড়"] },
+  { key: "song",     grp: "নাটক ও গান",     ic: "🎵", name: "ভিডিও গান",               long: false, minSec: 90,   queries: ["official video song", "new bangla song"] },
+  { key: "lofi",     grp: "নাটক ও গান",     ic: "🎧", name: "Lo-Fi গান",               long: false, minSec: 120,  queries: ["bangla lofi song", "bengali lofi mashup", "বাংলা লোফি গান", "bangla lofi slowed reverb"] },
+  { key: "found",    grp: null,             ic: "🔎", name: "সার্চ রেজাল্ট",            long: false, minSec: 0,    queries: [] }
 ];
 
 const DAY = 864e5;
 const $ = id => document.getElementById(id);
 const grid = $("grid"), more = $("more"), statusEl = $("status");
+const isDesktop = () => window.innerWidth > 1000;
 
 // ---------- ক্যাশ (localStorage) ----------
 function lsGet(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } }
@@ -155,14 +184,14 @@ function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return 
 function saveStore(key, arr) {
   for (let i = 0; i < 4; i++) {
     if (lsSet("vh_" + key, arr)) return;
-    arr = arr.slice(0, Math.floor(arr.length / 2));      // জায়গা না থাকলে অর্ধেক কমায়
+    arr = arr.slice(0, Math.floor(arr.length / 2));
   }
 }
 const store = {};
 CATS.forEach(c => store[c.key] = lsGet("vh_" + c.key, []));
 const meta = lsGet("vh_meta", { last: 0, rr: 0, block: 0 });
 const saveMeta = () => lsSet("vh_meta", meta);
-let sq = lsGet("vh_sq", {});                              // সার্চ ক্যাশ
+let sq = lsGet("vh_sq", {});
 
 // ---------- YouTube API ----------
 const decode = s => { const t = document.createElement("textarea"); t.innerHTML = s; return t.value; };
@@ -177,7 +206,6 @@ async function yt(path, params) {
   if (j.error) { const e = new Error(j.error.message); e.quota = /quota/i.test(j.error.message); throw e; }
   return j;
 }
-
 async function searchItems(p) {
   const j = await yt("search", { part: "snippet", type: "video", maxResults: 50, videoEmbeddable: "true", safeSearch: "moderate", ...p });
   const items = j.items.map(it => ({ id: it.id.videoId, t: decode(it.snippet.title),
@@ -196,10 +224,10 @@ function mergeInto(key, items, det, minSec) {
   items.forEach(v => {
     if (det[v.id] == null || det[v.id] < minSec) return;
     if (!map.has(v.id)) added++;
-    map.set(v.id, { id: v.id, t: v.t, c: v.c, p: v.p, d: det[v.id], f: now });   // f = সর্বশেষ দেখা
+    map.set(v.id, { id: v.id, t: v.t, c: v.c, p: v.p, d: det[v.id], f: now });
   });
   store[key] = [...map.values()]
-    .filter(v => now - v.f < KEEP_DAYS * DAY)           // ৬০ দিনের পুরনো মোছা
+    .filter(v => now - v.f < KEEP_DAYS * DAY)
     .sort((a, b) => b.p.localeCompare(a.p))
     .slice(0, MAX_PER_CAT);
   saveStore(key, store[key]);
@@ -266,11 +294,47 @@ function rebuild() {
     byId.set(v.id, o); all.push(o);
   }));
   all.sort((a, b) => b.p.localeCompare(a.p));
+  updateCounts();
 }
 function showUpdated() {
   const mins = meta.last ? Math.round((Date.now() - meta.last) / 60000) : null;
   $("upd").textContent = `${all.length} টি ভিডিও` + (mins == null ? "" : ` • শেষ আপডেট ${mins} মিনিট আগে`);
 }
+
+// ---------- সাইডবার ----------
+const sidebar = $("sidebar");
+function addItem(parent, key, ic, name) {
+  const b = document.createElement("button");
+  b.className = "sitem" + (key === "all" ? " active" : ""); b.dataset.k = key;
+  b.innerHTML = `<span class="ic">${ic}</span><span class="nm"></span><span class="cnt"></span>`;
+  b.querySelector(".nm").textContent = name;
+  b.onclick = () => { goHome(true); setCat(key); closeSbIfOverlay(); window.scrollTo(0, 0); };
+  parent.appendChild(b);
+}
+(function buildSidebar() {
+  const g0 = document.createElement("div"); g0.className = "sgroup";
+  addItem(g0, "all", "🏠", "হোম (সব ভিডিও)");
+  sidebar.appendChild(g0);
+  const groups = [];
+  CATS.filter(c => c.grp).forEach(c => { if (!groups.includes(c.grp)) groups.push(c.grp); });
+  groups.forEach(gn => {
+    const g = document.createElement("div"); g.className = "sgroup";
+    const h = document.createElement("h4"); h.textContent = gn; g.appendChild(h);
+    CATS.filter(c => c.grp === gn).forEach(c => addItem(g, c.key, c.ic, c.name));
+    sidebar.appendChild(g);
+  });
+})();
+function updateCounts() {
+  document.querySelectorAll(".sitem").forEach(b => {
+    const k = b.dataset.k;
+    const n = k === "all" ? all.length : (store[k] ? store[k].length : 0);
+    b.querySelector(".cnt").textContent = n ? n : "";
+  });
+}
+function setSb(on) { document.body.classList.toggle("sbshow", on); }
+function closeSbIfOverlay() { if (!isDesktop() || document.body.classList.contains("watching")) setSb(false); }
+$("menu").onclick = () => setSb(!document.body.classList.contains("sbshow"));
+$("backdrop").onclick = () => setSb(false);
 
 // ---------- হোম ইউআই ----------
 function makeCard(v, cls) {
@@ -290,10 +354,12 @@ function makeCard(v, cls) {
 function refreshHome() {
   if (mode === "home") {
     view = all.filter(v => cat === "all" || v.k === cat);
-    $("heading").hidden = true;
+    const h = $("heading");
+    if (cat === "all") h.hidden = true;
+    else { h.hidden = false; h.textContent = (CATS.find(c => c.key === cat) || {}).name || ""; }
+    grid.innerHTML = ""; shown = 0;
+    render();
   }
-  grid.innerHTML = ""; shown = 0;
-  render();
 }
 function render() {
   view.slice(shown, shown + PAGE).forEach(v => grid.appendChild(makeCard(v, "card")));
@@ -301,17 +367,9 @@ function render() {
   more.hidden = shown >= view.length;
 }
 more.onclick = render;
-
-const tabsEl = $("tabs");
-[{ key: "all", name: "সব" }, ...CATS.filter(c => c.queries.length)].forEach(c => {
-  const b = document.createElement("button");
-  b.className = "tab" + (c.key === "all" ? " active" : ""); b.textContent = c.name; b.dataset.k = c.key;
-  b.onclick = () => { goHome(true); setCat(c.key); };
-  tabsEl.appendChild(b);
-});
 function setCat(k) {
   cat = k; mode = "home"; statusEl.textContent = "";
-  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.k === k));
+  document.querySelectorAll(".sitem").forEach(t => t.classList.toggle("active", t.dataset.k === k));
   refreshHome();
 }
 
@@ -328,8 +386,7 @@ async function liveSearch(q) {
   rebuild();
   const r = items.map(v => byId.get(v.id)).filter(Boolean);
   sq[key] = { t: Date.now(), ids: r.map(v => v.id) };
-  const keys = Object.keys(sq).sort((a, b) => sq[b].t - sq[a].t).slice(15);
-  keys.forEach(k => delete sq[k]);
+  Object.keys(sq).sort((a, b) => sq[b].t - sq[a].t).slice(15).forEach(k => delete sq[k]);
   lsSet("vh_sq", sq);
   return r;
 }
@@ -340,7 +397,7 @@ function localSearch(q) {
 async function doSearch(q) {
   goHome(true);
   mode = "search"; curQ = q;
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".sitem").forEach(t => t.classList.remove("active"));
   grid.innerHTML = ""; more.hidden = true;
   const h = $("heading"); h.hidden = false; h.textContent = `“${q}” এর ফলাফল`;
   statusEl.textContent = "YouTube থেকে খোঁজা হচ্ছে...";
@@ -381,7 +438,7 @@ function relatedOf(v) {
 function openWatch(id, push) {
   const v = byId.get(id) || { id, t: "ভিডিও", c: "", p: "", d: 0, k: null };
   $("home").hidden = true; $("watch").hidden = false;
-  document.body.classList.add("watching");
+  document.body.classList.add("watching"); setSb(false);
   $("player").src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1`;
   $("wt").textContent = v.t;
   const bits = [];
@@ -400,6 +457,7 @@ function showHomeUI() {
   $("player").src = "";
   $("watch").hidden = true; $("home").hidden = false;
   document.body.classList.remove("watching");
+  setSb(isDesktop());
   document.title = "Habib Video Hub";
 }
 function goHome(push) {
@@ -417,6 +475,7 @@ window.addEventListener("popstate", () => {
 });
 
 // ---------- শুরু ----------
+setSb(isDesktop());
 rebuild(); refreshHome(); showUpdated();
 (() => { const m = /^#v=([\w-]{6,})/.exec(location.hash); if (m) openWatch(m[1], false); })();
 tick();
